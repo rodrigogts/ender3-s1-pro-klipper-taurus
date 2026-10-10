@@ -1,3 +1,10 @@
+# Local CLI Apenas
+
+## Commits
+
+- Criar commits sem `Co-authored-by` ou qualquer indicação similar de coautoria ou atribuição ao agente.
+- Não adicionar trailers de autoria do agente nem assinaturas automáticas na mensagem do commit.
+
 # Projeto — Impressão 3D
 
 ## Regras

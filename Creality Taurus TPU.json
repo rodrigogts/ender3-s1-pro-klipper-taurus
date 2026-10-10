@@ -6,7 +6,7 @@
 		"15"
 	],
 	"filament_deretraction_speed": [
-		"20"
+		"40"
 	],
 	"filament_extruder_variant": [
 		"Direct Drive Standard"
@@ -14,8 +14,11 @@
 	"filament_retract_when_changing_layer": [
 		"0"
 	],
+	"filament_retraction_length": [
+		"2"
+	],
 	"filament_retraction_speed": [
-		"20"
+		"40"
 	],
 	"filament_settings_id": [
 		"Creality Taurus TPU"
@@ -30,10 +33,10 @@
 	"inherits": "Creality Generic TPU",
 	"name": "Creality Taurus TPU",
 	"nozzle_temperature": [
-		"230"
+		"225"
 	],
 	"nozzle_temperature_initial_layer": [
-		"235"
+		"230"
 	],
 	"overhang_fan_speed": [
 		"40"
