@@ -1,0 +1,36 @@
+{
+	"fan_max_speed": [
+		"20"
+	],
+	"fan_min_speed": [
+		"20"
+	],
+	"filament_extruder_variant": [
+		"Direct Drive Standard"
+	],
+	"filament_settings_id": [
+		"Creality Taurus ABS"
+	],
+	"from": "User",
+	"full_fan_speed_layer": [
+		"4"
+	],
+	"inherits": "Creality Generic ABS",
+	"name": "Creality Taurus ABS",
+	"nozzle_temperature": [
+		"245"
+	],
+	"nozzle_temperature_initial_layer": [
+		"250"
+	],
+	"nozzle_temperature_range_high": [
+		"250"
+	],
+	"overhang_fan_speed": [
+		"35"
+	],
+	"reduce_fan_stop_start_freq": [
+		"0"
+	],
+	"version": "2.3.2.75"
+}
