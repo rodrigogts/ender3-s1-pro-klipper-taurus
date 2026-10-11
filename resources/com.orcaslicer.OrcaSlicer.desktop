@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=OrcaSlicer
+Comment=3D printing slicer
+Exec=/home/tavares/3d-print/tools/orca-slicer/OrcaSlicer.AppImage %F
+TryExec=/home/tavares/3d-print/tools/orca-slicer/OrcaSlicer.AppImage
+Icon=com.orcaslicer.OrcaSlicer
+Terminal=false
+Type=Application
+PrefersNonDefaultGPU=true
+Categories=Graphics;3DGraphics;
+MimeType=model/stl;application/vnd.ms-3mfdocument;application/prs.wavefront-obj;application/x-amf;
+StartupNotify=true
+StartupWMClass=orca-slicer
