@@ -14,6 +14,7 @@ Usar os arquivos para identificar o valor configurado, sua origem e o preset em 
 |---|---|---|
 | Filamento PLA | `Creality Taurus PLA.json` | `Creality Generic PLA.json` |
 | Filamento PETG | `Creality Taurus PETG.json` | `Creality Generic PETG.json` |
+| Filamento Tritan HT (3D Fila) | `Creality Taurus PETG XT.json` | `Creality Generic PETG.json` |
 | Filamento ABS | `Creality Taurus ABS.json` | `Creality Generic ABS.json` |
 | Filamento TPU | `Creality Taurus TPU.json` | `Creality Generic TPU.json` |
 | Impressora | `Frank Pro 0.4 nozzle.json` | `Creality Ender-3 S1 Pro 0.4 nozzle.json` |
@@ -40,7 +41,7 @@ Para resolver essa referência, consultar `Creality Generic PLA.json` e conferir
 4. Se a chave estiver ausente, consultar a base indicada por `inherits`.
 5. Registrar o valor resultante e o arquivo que o fornece.
 
-As bases diretas da tabela são autossuficientes para os campos que documentam. A consulta dos seis personalizados segue um único vínculo: personalizado → base direta.
+As bases diretas da tabela são autossuficientes para os campos que documentam. A consulta dos sete personalizados segue um único vínculo: personalizado → base direta.
 
 A resolução acontece por chave inteira. Um array definido no personalizado substitui o array da base; seus elementos não são concatenados. Manter strings, arrays, condições, expressões e G-code exatamente como estão armazenados.
 
@@ -87,6 +88,7 @@ Ao apresentar uma configuração, identificar:
 |---|---|---|
 | `Creality Taurus PLA.json` | Ajustes específicos de PLA para a Frank Pro | `Creality Generic PLA.json` |
 | `Creality Taurus PETG.json` | Ajustes específicos de PETG para a Frank Pro | `Creality Generic PETG.json` |
+| `Creality Taurus PETG XT.json` | Ajustes específicos do Tritan HT da 3D Fila para a Frank Pro | `Creality Generic PETG.json` |
 | `Creality Taurus ABS.json` | Ajustes específicos de ABS para a Frank Pro | `Creality Generic ABS.json` |
 | `Creality Taurus TPU.json` | Ajustes específicos de TPU para a Frank Pro | `Creality Generic TPU.json` |
 
@@ -95,6 +97,20 @@ Consultar esses pares para temperaturas do bico e das superfícies de mesa, cool
 Distinguir temperatura da primeira camada da temperatura das demais camadas. Para a mesa, identificar o campo correspondente à superfície selecionada no Orca.
 
 Os percentuais de fan devem ser analisados considerando o Taurus dual 5015. Usar o estado validado nas instruções do projeto e os testes do material para distinguir configuração armazenada de calibração medida.
+
+### `Creality Taurus PETG XT.json` — Tritan HT 3D Fila
+
+Preset do filamento **Tritan HT, 3D Fila**, cor Black Petroleum, carretel de 1 kg. Tritan é um copoliéster, não PETG; o preset herda de `Creality Generic PETG` por proximidade de processo.
+
+Etiqueta do fabricante:
+
+| Item | Valor |
+|---|---|
+| Temperatura do bico (T.B) | 250–275 °C |
+| Temperatura da mesa (T.M) | 110–120 °C |
+| Lote/código | `THT501753` / `0009627` |
+
+Valores explícitos no preset: bico 265 °C (270 °C na primeira camada), mesa 105 °C em todas as camadas. A mesa configurada fica abaixo da faixa da etiqueta. Os campos `nozzle_temperature_range_low/high` (250/255) e `filament_vendor` (`Taurus`) vieram da cópia do preset PETG e não descrevem este material. Nenhum desses valores foi validado na Frank Pro.
 
 ### Referências Generic @System
 

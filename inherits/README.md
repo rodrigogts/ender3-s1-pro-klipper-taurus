@@ -59,6 +59,7 @@ Há também `fdm_machine_common.json` em `system/Custom/machine/` e `fdm_process
 |---|---|
 | `Creality Taurus PLA.json` | `user/default/filament/Creality Taurus PLA.json` |
 | `Creality Taurus PETG.json` | `user/default/filament/Creality Taurus PETG.json` |
+| `Creality Taurus PETG XT.json` | `user/default/filament/Creality Taurus PETG XT.json` |
 | `Creality Taurus ABS.json` | `user/default/filament/Creality Taurus ABS.json` |
 | `Creality Taurus TPU.json` | `user/default/filament/Creality Taurus TPU.json` |
 | `Frank Pro 0.4 nozzle.json` | `user/default/machine/Frank Pro 0.4 nozzle.json` |
@@ -100,7 +101,7 @@ A atualização é feita da instalação para este projeto. As bases unificadas 
 4. Substituir cada campo inteiro quando houver override. Não concatenar arrays nem fazer merge dos elementos.
 5. Preservar todos os valores e tipos JSON, inclusive strings numéricas, arrays, strings vazias, `nil`, zero, condições, percentuais e G-code.
 6. Remover `inherits` do objeto final. Preservar a identificação da base direta, como `name`, `type`, `from`, `setting_id` e `instantiation`, conforme os valores resultantes dos originais.
-7. Salvar na raiz com o nome original da base direta. Manter estes originais e os seis presets personalizados Taurus/Frank intactos.
+7. Salvar na raiz com o nome original da base direta. Manter estes originais e os sete presets personalizados Taurus/Frank intactos.
 8. Atualizar `../fontes-internas-projeto-impressao-3d.md` se a estrutura ou as fontes mudarem.
 
 Pseudocódigo:

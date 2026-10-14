@@ -10,6 +10,7 @@ O repositório reúne presets de impressora, filamentos e processo, rotinas de G
 |---|---|
 | `Frank Pro 0.4 nozzle.json` | Preset personalizado da impressora com flavor Klipper e rotinas de G-code |
 | `Creality Taurus PLA/PETG/ABS/TPU.json` | Presets personalizados dos quatro materiais, em arquivos separados |
+| `Creality Taurus PETG XT.json` | Preset personalizado do Tritan HT da 3D Fila, herdando da base PETG |
 | `0.20mm Standard @Taurus.json` | Preset personalizado de processo |
 | `Creality Generic *.json` | Bases diretas dos filamentos Taurus |
 | `Creality Ender-3 S1 Pro 0.4 nozzle.json` | Base direta do preset Frank Pro |
@@ -30,7 +31,7 @@ Os presets Taurus e Frank Pro herdam de suas bases pelo campo `inherits`. As sei
 
 Os arquivos originais usados nessa composição estão em `inherits/`. O [README dessa pasta](inherits/README.md) documenta os caminhos das fontes na instalação local do OrcaSlicer, o procedimento de atualização e a unificação das bases.
 
-Para utilizar como referência em um projeto do GPT, selecione os arquivos da raiz destinados à consulta e use as instruções próprias do seu projeto. A resolução dos seis presets personalizados pode ser feita com os respectivos arquivos-base da raiz.
+Para utilizar como referência em um projeto do GPT, selecione os arquivos da raiz destinados à consulta e use as instruções próprias do seu projeto. A resolução dos sete presets personalizados pode ser feita com os respectivos arquivos-base da raiz.
 
 ## Aplicação em outras impressoras
 
