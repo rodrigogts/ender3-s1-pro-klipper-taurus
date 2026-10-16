@@ -45,6 +45,15 @@ Usar resina quando detalhe/acabamento/miniaturas justificarem.
 - Primeira camada validada com PLA bom.
 - Benchy em Klipper ainda não validado.
 Importante: Klipper compilado com toolchain moderna não foi aceito pelo bootloader. Solução validada: v0.11.0 com GNU Arm Embedded 10.3-2021.10/GCC 10.3.1. Não atualizar MCU nem trocar essa base sem motivo e teste controlado.
+- Klipper host v0.13.0-786-g461c4e372 (Raspberry Pi 3, MainsailOS 3.0.0), lido em 2026-10-16. A divergência host v0.13 × MCU v0.11 é intencional e validada; o aviso `deprecated_mcu_code` do Klipper é esperado. Não recomendar atualização da MCU só por essa divergência. Detalhes e o que conta como problema real: `docs/frank-pro-klipper-host-mcu.md`.
+
+## Frank Pro — consulta via Moonraker
+Ferramenta padrão de consulta e diagnóstico: `scripts/frank-pro.mjs` (Node 18+, sem dependências). Usar antes de `curl` avulso.
+- Uso: `node scripts/frank-pro.mjs --host <ip> [--param <consulta>] [--json] [--watch <s>]`. O endereço sempre entra por `--host`, nunca fixo no script; atual: `192.168.0.150` (`mainsailos.local`).
+- Consultas: `painel` (padrão), `status`, `temps`, `limites`, `versoes`, `historico` (`--limit`, `--file`), `arquivo` (`--file`), `arquivos`, `mesh`, `sensores`, `config` (`--section`), `avisos`. Detalhes em `scripts/README.md`.
+- Usos típicos: `--param historico` para tempo real × estimativa do slicer; `--param limites` para detectar `SET_VELOCITY_LIMIT` residual; `--param temps` para subtensão/throttling do Pi; `--param avisos` separa avisos reais dos esperados.
+- **Somente leitura**: o script faz apenas GET. Não acrescentar envio de G-code, start/pause/cancel/resume, firmware restart nem escrita de config. Ações na impressora e mudanças no Klipper são do usuário, pelo Mainsail.
+- A build validada da MCU fica na constante `MCU_VALIDADA` do script; se mudar após teste controlado, atualizar junto com `docs/frank-pro-klipper-host-mcu.md`.
 
 ## Frank Pro — Orca/fluxo
 - G-code flavor: Klipper.

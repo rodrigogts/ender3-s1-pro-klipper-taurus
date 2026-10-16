@@ -21,6 +21,7 @@ O repositório reúne presets de impressora, filamentos e processo, rotinas de G
 | `start-n-end-gcode.gcode` | Referência legível das rotinas de início, encerramento e pausa |
 | `fontes-internas-projeto-impressao-3d.md` | Guia dos arquivos, heranças e precedência dos valores |
 | `inherits/` | Originais das bases e instruções para reproduzir sua unificação |
+| `scripts/` | Painel e consultas somente leitura da Frank Pro via Moonraker |
 | `AGENTS.md` | Instruções para o agente de desenvolvimento local e contexto técnico do projeto |
 
 ## Como consultar e adaptar
