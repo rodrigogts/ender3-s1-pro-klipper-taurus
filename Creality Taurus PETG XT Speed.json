@@ -1,4 +1,7 @@
 {
+	"enable_pressure_advance": [
+		"1"
+	],
 	"fan_max_speed": [
 		"15"
 	],
@@ -7,6 +10,9 @@
 	],
 	"filament_deretraction_speed": [
 		"30"
+	],
+	"filament_end_gcode": [
+		"; filament end gcode \n; ZERA O PA PARA NAO VAZAR PARA A PROXIMA IMPRESSAO\nSET_PRESSURE_ADVANCE ADVANCE=0\n"
 	],
 	"filament_extruder_variant": [
 		"Direct Drive Standard"
@@ -45,19 +51,22 @@
 	"inherits": "Creality Generic PETG",
 	"name": "Creality Taurus PETG XT Speed",
 	"nozzle_temperature": [
-		"265"
+		"270"
 	],
 	"nozzle_temperature_initial_layer": [
 		"270"
 	],
 	"nozzle_temperature_range_high": [
-		"275"
+		"270"
 	],
 	"nozzle_temperature_range_low": [
 		"250"
 	],
 	"overhang_fan_speed": [
 		"25"
+	],
+	"pressure_advance": [
+		"0.12"
 	],
 	"version": "2.3.2.75"
 }
