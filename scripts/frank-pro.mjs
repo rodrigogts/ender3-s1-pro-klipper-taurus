@@ -77,6 +77,10 @@ const fmtDur = (s) => {
   const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;
   return h ? `${h}h${String(m).padStart(2, '0')}m${String(r).padStart(2, '0')}s` : `${m}m${String(r).padStart(2, '0')}s`;
 };
+// Estimativa do slicer já ultrapassada: mostra quanto passou em vez de 0
+const fmtRestante = (s) => (s != null && s < 0 ? c.yellow(`+${fmtDur(-s)} além do slicer`) : fmtDur(s));
+// "~" marca camada estimada pelo Z (G-code sem SET_PRINT_STATS_INFO)
+const fmtCamada = (d) => `${d.camada == null ? '—' : (d.camada_estimada ? '~' : '') + d.camada}/${d.camadas ?? '—'}`;
 const fmtDate = (ts) => (ts ? new Date(ts * 1000).toLocaleString('pt-BR') : '—');
 const n = (v, d = 1) => (v == null || !isFinite(v) ? '—' : Number(v).toFixed(d));
 const pct = (v) => `${n(v * 100, 1)}%`;
@@ -126,12 +130,26 @@ Q.painel = async () => {
   const meta = ps.filename ? await metadata(ps.filename) : null;
   const progress = s.virtual_sdcard.progress ?? 0;
   const est = meta?.estimated_time ?? null;
-  const restanteSlicer = est != null ? est - ps.print_duration : null;
-  const restanteProg = progress > 0.01 ? ps.print_duration / progress - ps.print_duration : null;
+  // Restante só faz sentido com o trabalho em andamento
+  const ativo = ps.state === 'printing' || ps.state === 'paused';
+  const restanteSlicer = ativo && est != null ? est - ps.print_duration : null;
+  const restanteProg = ativo && progress > 0.01 ? ps.print_duration / progress - ps.print_duration : null;
+  const camadas = ps.info?.total_layer ?? meta?.layer_count ?? null;
+  // Sem SET_PRINT_STATS_INFO no G-code o Klipper não sabe a camada; estima pelo Z (z-hop pode adiantar 1–2)
+  let camada = ps.info?.current_layer ?? null, camadaEstimada = false;
+  // Só estima se o G-code não informa camadas (total_layer nulo) e a impressão já começou de fato;
+  // durante o start G-code o Z (ex.: Z10 do aquecimento) não corresponde a camada nenhuma
+  if (camada == null && ps.info?.total_layer == null && ps.state === 'printing' && ps.print_duration > 0
+      && meta?.layer_height && meta?.first_layer_height) {
+    const z = s.gcode_move.gcode_position[2];
+    camada = Math.max(1, Math.round((z - meta.first_layer_height) / meta.layer_height) + 1);
+    if (camadas) camada = Math.min(camada, camadas);
+    camadaEstimada = true;
+  }
   return {
     klippy: s.webhooks, estado: ps.state, mensagem: ps.message || s.display_status.message || '',
     arquivo: ps.filename || null, progresso: progress,
-    camada: ps.info?.current_layer ?? null, camadas: ps.info?.total_layer ?? meta?.layer_count ?? null,
+    camada, camada_estimada: camadaEstimada, camadas,
     tempo: { impressao: ps.print_duration, total: ps.total_duration, estimativa_slicer: est,
       restante_slicer: restanteSlicer, restante_por_progresso: restanteProg },
     filamento_mm: ps.filament_used,
@@ -149,10 +167,11 @@ Q.painel.print = (d) => {
   L.push(`Estado     ${stateColor(d.estado)}${d.mensagem ? c.dim(`  ${d.mensagem}`) : ''}   ${c.dim(`idle: ${d.idle}, homed: ${d.homed || '—'}`)}`);
   if (d.arquivo) {
     L.push(`Arquivo    ${d.arquivo}`);
-    L.push(`Progresso  ${bar(d.progresso)} ${pct(d.progresso)}   camada ${d.camada ?? '—'}/${d.camadas ?? '—'}`);
+    L.push(`Progresso  ${bar(d.progresso)} ${pct(d.progresso)}   camada ${fmtCamada(d)}`);
     const t = d.tempo;
     L.push(`Tempo      impressão ${fmtDur(t.impressao)}  total ${fmtDur(t.total)}  slicer ${fmtDur(t.estimativa_slicer)}`);
-    L.push(`Restante   pelo slicer ${fmtDur(t.restante_slicer)}  pelo progresso ${fmtDur(t.restante_por_progresso)}`);
+    if (t.restante_slicer != null || t.restante_por_progresso != null)
+      L.push(`Restante   pelo slicer ${fmtRestante(t.restante_slicer)}  pelo progresso ${fmtDur(t.restante_por_progresso)}`);
     L.push(`Filamento  ${n(d.filamento_mm / 1000, 2)} m`);
   }
   L.push(`Bico       ${heater(d.bico)}`);
@@ -167,8 +186,13 @@ Q.painel.print = (d) => {
 Q.status = async () => Q.painel();
 Q.status.print = (d) => {
   const parts = [stateColor(d.estado)];
-  if (d.arquivo) parts.push(pct(d.progresso), `camada ${d.camada ?? '—'}/${d.camadas ?? '—'}`,
-    `restante ${fmtDur(d.tempo.restante_slicer ?? d.tempo.restante_por_progresso)}`);
+  if (d.arquivo) {
+    parts.push(pct(d.progresso), `camada ${fmtCamada(d)}`);
+    const t = d.tempo;
+    if (t.restante_slicer != null) parts.push(`restante ${fmtRestante(t.restante_slicer)}`);
+    else if (t.restante_por_progresso != null) parts.push(`restante ${fmtDur(t.restante_por_progresso)}`);
+    else parts.push(`impressão ${fmtDur(t.impressao)}`);
+  }
   parts.push(`bico ${n(d.bico.temperature, 0)}/${n(d.bico.target, 0)}`, `mesa ${n(d.mesa.temperature, 0)}/${n(d.mesa.target, 0)}`);
   if (d.arquivo) parts.push(d.arquivo);
   return parts.join(' | ');

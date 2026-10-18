@@ -31,6 +31,8 @@ O endereço é sempre passado em `--host`. Aceita IP, `IP:porta` (ex.: `:7125`, 
 | `config` | Seções do `printer.cfg` parseadas pelo Klipper. Com `--section printer`, mostra uma seção |
 | `avisos` | Depreciações e avisos do Klipper e do Moonraker |
 
+A camada vem do Klipper quando o G-code chama `SET_PRINT_STATS_INFO`, como faz o preset `Frank Pro 0.4 nozzle Speed`. Em G-codes sem essa chamada, a camada é estimada pela altura Z e aparece com `~` (o z-hop pode adiantar uma ou duas camadas). Quando a impressão passa da estimativa do slicer, o restante aparece como `+tempo além do slicer`.
+
 A diferença entre o Klipper do host (v0.13) e o da MCU (v0.11 com GCC 10.3.1) é intencional. Quando a MCU está na build validada, `versoes` mostra a divergência como esperada e `avisos` lista o `deprecated_mcu_code` à parte, como aviso esperado. Uma MCU diferente da validada, o Klipper fora do `ready` ou qualquer outro aviso continuam aparecendo como problema. Veja [docs/frank-pro-klipper-host-mcu.md](../docs/frank-pro-klipper-host-mcu.md).
 
 Opções gerais: `--json` (saída para processamento), `--watch <s>` (repete a consulta) e `--help`. As cores são desativadas com `NO_COLOR` ou quando a saída não é um terminal.
