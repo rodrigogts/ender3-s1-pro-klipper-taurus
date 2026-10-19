@@ -26,14 +26,15 @@ M112               ; parada de emergência
 ## Temperatura
 ```gcode
 M104 S<°C>                     ; bico, sem esperar
-M109 S<°C>                     ; bico, espera chegar
+M109 S<°C>                     ; bico, espera ESTABILIZAR (±1 °C e < 0,1 °C/s): com o pico do PID, ~40 s a mais
 M140 S<°C>                     ; mesa, sem esperar
 M190 S<°C>                     ; mesa, espera chegar
 SET_HEATER_TEMPERATURE HEATER=heater_bed TARGET=105
-TEMPERATURE_WAIT SENSOR=heater_bed MINIMUM=100
+TEMPERATURE_WAIT SENSOR=heater_bed MINIMUM=100           ; espera só chegar; aceita MAXIMUM=
 TURN_OFF_HEATERS
 ```
 - A mesa tem `max_temp` 110, então o máximo prático é ~105 °C.
+- `M109`/`M190` só liberam com a temperatura estável (±1 °C e < 0,1 °C/s). Medido em 2026-10-18: bico 170 → 225 passa a 229,3 °C e só libera aos ~70 s (chegou aos ~29 s); mesa → 65 passa a 66,1 °C e libera ~50 s depois de chegar. O start G-code da Speed usa `TEMPERATURE_WAIT` para não esperar esse pico.
 - O idle_timeout é de 600 s. Quando dispara, desliga os heaters e roda M84. Pra pausa longa: `SET_IDLE_TIMEOUT TIMEOUT=1800`.
 
 ## PID (repetir se trocar bico, heater, termistor ou cooling)

@@ -48,7 +48,7 @@ Legenda: VALIDADO = medido ou testado na máquina; PENDENTE = ainda não feito; 
 
 ## Orca — presets (`orca/`)
 - impressora `Frank Pro 0.4 nozzle`: perfil original; limites de máquina herdados da S1 Pro
-- impressora `Frank Pro 0.4 nozzle Speed`: limites 2000 mm/s² e 300 mm/s alinhados ao printer.cfg; `SET_PRINT_STATS_INFO` (camada atual e total); PAUSE na troca de filamento
+- impressora `Frank Pro 0.4 nozzle Speed`: limites 2000 mm/s² e 300 mm/s alinhados ao printer.cfg; `SET_PRINT_STATS_INFO` (camada atual e total); PAUSE na troca de filamento; aquecimento com `PREAQUECE_BICO S=170` e `TEMPERATURE_WAIT` (mesa MIN alvo / MAX alvo+3; bico MIN alvo / MAX alvo+8) no lugar de `M190`/`M109` desde 2026-10-19
 - processo `0.20mm Standard @Taurus`: perfil original
 - processos `… PETG XT Speed` e `… PLA Speed` (iguais por enquanto): acelerações por tipo (parede externa e topo 1000, internas e sólido 1600, sparse 1800, travel 2000, primeira camada 650/900); paredes internas e infill a 90 mm/s, parede externa 60, topo 40
 - filamento `Creality Taurus PETG XT Speed`: VALIDADO (PETG XT/Tritan HT 3D Fila, 270 °C, PA 0.125)

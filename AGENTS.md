@@ -69,6 +69,8 @@ Ferramenta padrão de consulta e diagnóstico: `scripts/frank-pro.mjs` (Node 18+
 - Não usar `M420 S1`.
 - `PAUSE` substitui usos antigos de `M25` e é o que os presets usam na pausa e na troca de filamento.
 - `M600` (`macros.cfg`, estilo Marlin) testado e funcionando desde 2026-10-18: na troca de cor por camada, o usuário põe `M600` como custom G-code no Orca na primeira camada da cor nova. Detalhes em `resources/utils/klipper.md` e `to-do/macros-klipper.md`.
+- O start G-code da impressora Speed usa `PREAQUECE_BICO S=170` (macro do `macros.cfg`): sem esse arquivo na impressora, a impressão para com comando desconhecido.
+- O start G-code da Speed espera temperatura com `TEMPERATURE_WAIT` (MIN = alvo; MAX = alvo +3 na mesa, +8 no bico), não com `M190`/`M109`: no Klipper eles esperam estabilizar e o pico do PID custava ~1,5 min por impressão (medido em 2026-10-18). Manter `M140`/`M104` no start, senão o Orca insere `M190`/`M109` sozinho.
 - Não ativar firmware retraction sem `[firmware_retraction]`.
 - Nunca editar os presets de sistema nem os personalizados originais (`Frank Pro 0.4 nozzle`, `0.20mm Standard @Taurus`, filamentos sem "Speed"). Trabalhar nos overrides Speed.
 - Ao alterar um preset: gravar em `~/.config/OrcaSlicer/user/default/` e na cópia do repo, que precisam ficar idênticas. O Orca só lê preset alterado depois de reiniciar; se o GUI antigo salvar antes, sobrescreve a mudança. Avisar o usuário.
