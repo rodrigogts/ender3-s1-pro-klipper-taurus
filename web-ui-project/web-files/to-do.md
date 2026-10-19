@@ -12,7 +12,7 @@ Regras:
 |---|---|---|---|---|
 | [mesa-termistor.md](mesa-termistor.md) | Frank Pro | aberto | alta | Termistor da mesa com leitura errática entre 95 e 97 °C que desarmou o verify_heater duas vezes. Suspeita no lado quente; medir ~100 kΩ mexendo o cabo |
 | [pi-fonte.md](pi-fonte.md) | Frank Pro | comprada, teste pendente | alta | Fonte nova do Pi: confirmar que somem o "Previously Under-Volted" e a queda do USB da MCU |
-| [pla-speed-validacao.md](pla-speed-validacao.md) | Frank Pro | em andamento | alta | Benchy PLA Speed com calombos na proa e numa lateral (Z 5–10), pior com SCV 5; o SCV 1 só atenuava. Teste curto de casco duplo (15 min) para separar refrigeração × direção |
+| [pla-speed-validacao.md](pla-speed-validacao.md) | Frank Pro | pausado | média | Calombos no overhang do casco do Benchy em PLA Speed (Z 5–10). O casco oco reproduz em ~12 min; o teste com PA 0.025 está pronto (G-code editado) e não foi impresso. Peças sem overhang daquele tipo imprimem bem |
 | [petg-max-flowrate.md](petg-max-flowrate.md) | Frank Pro | pendente | média | Max flowrate do PETG XT a 270 °C e limite de ~85% no `filament_max_volumetric_speed` |
 | [bico-cht.md](bico-cht.md) | Frank Pro | pedido, em trânsito | média | Bico CHT 0.4 latão + CuCrZr para mais vazão; depois de instalar, refazer z_offset, vazão e PA |
 | [input-shaper-adxl.md](input-shaper-adxl.md) | Frank Pro | pendente | média | ADXL345 + Input Shaper medido na própria máquina antes de subir acelerações |
@@ -20,7 +20,7 @@ Regras:
 | [abs-calibracao.md](abs-calibracao.md) | Frank Pro | pendente | baixa | Criar o ABS Speed e calibrar temperatura, vazão e PA do ABS |
 | [speed-como-padrao.md](speed-como-padrao.md) | Frank Pro | decisão pendente | baixa | Tornar o Speed o perfil padrão: por material, conforme for validado, ou renomear tudo no fim |
 | [trilhos-lineares.md](trilhos-lineares.md) | Frank Pro | decisão tomada: não agora | baixa | Trilhos lineares XYZ: sem ganho comprovado na S1 Pro; reabrir só com evidência de folga ou ringing |
-| [macros-klipper.md](macros-klipper.md) | Frank Pro | proposta, instalação pelo usuário | média | `macros.cfg`: `M600` estilo Marlin (estaciona no canto sup. esquerdo, janela no Mainsail, purga, volta XY-alto/desce), `CENTRO`, `CANTO N=` e `PREAQUECE_BICO` (start G-code sem derrubar bico quente) |
+| [macros-klipper.md](macros-klipper.md) | Frank Pro | M600 validado, detalhes pendentes | baixa | `macros.cfg`: `M600` estilo Marlin VALIDADO em 2026-10-18 (troca bonita, janelas do Mainsail guiando). Falta conferir bolinha na retomada e `PREAQUECE_BICO` com bico quente |
 | [stray-kids-logo.md](stray-kids-logo.md) | Frank Pro | impressão pendente | baixa | Logo em 3 cores montado no Tinkercad; procedimento de troca de cor com PAUSE |
 | [orca-bundle-export.md](orca-bundle-export.md) | Frank Pro | pendente | baixa | Reexportar o `.orca_printer` (o atual é de 2026-10-05, sem os Speed) |
 | [cli-fatiamento-helper.md](cli-fatiamento-helper.md) | Frank Pro | ideia | baixa | Script para fatiar pelo CLI do Orca (torres, comparações) com as correções já conhecidas |
@@ -154,7 +154,24 @@ O estado completo, as hipóteses e o plano estão em `printers/frank-mini/README
 
 <!-- fonte: to-do/macros-klipper.md -->
 # Macros: troca de filamento estilo Marlin (M600), posicionamento do bico e pré-aquecimento
-- status: proposta; o usuário aplica no Mainsail
+- status: M600 VALIDADO em 2026-10-18; falta só conferir dois detalhes (abaixo)
+
+## Teste real, 2026-10-18 (job da placa do R, `teste-placa-20x20-letra-R_PLA_3m37s.gcode`)
+- `M600` inserido no Orca como custom G-code na camada 6: no G-code, logo depois de `SET_PRINT_STATS_INFO CURRENT_LAYER=6` e antes da subida para a camada
+- 23:30:38 pausa; idle_timeout 1800 s; Z subiu para 20 (peça em Z 1.0) e foi a X0 Y220; descarga +10/−50 mm; janela aberta às 23:30:49
+- 23:31:59 `CARREGA_TROCA` (botão); purga em X0 Y0; janela "Purga feita" às 23:32:21
+- 23:32:32 `RETOMA_TROCA` (botão); idle_timeout volta a 600 s; continuou a camada 6 → 10
+- resultado: "a troca ficou linda", mensagens do Mainsail orientando cada passo
+- `PREAQUECE_BICO` no mesmo job: bico frio → foi a 170 enquanto a mesa aquecia (comportamento esperado)
+
+## Pendências pequenas
+- gotinha na retomada: CONFIRMADA pelo usuário em 2026-10-19 (Stray Kids, troca da camada 16). Causas:
+  1. sobra de 0.8 mm: o Orca retrai 0.8 mm antes do `M600` e devolve 0.8 mm (`G1 E.8`) logo depois da retomada, mas a purga já deixou o bico cheio; o `RESUME` devolve só o 1 mm do `CARREGA_TROCA`. Sobram ~0.8 mm (~1.9 mm³) no primeiro ponto. Conferido nos dois `M600` do G-code do Stray Kids (retração total 0.8 antes, `G1 E.8` depois).
+  2. escorrimento: só 1 mm de retração enquanto o bico quente espera a limpeza e o clique.
+- correção pronta em `to-do/macros-v2-PARA-INSTALAR.cfg` (v2, só ASCII, diferença mínima para o snapshot): `ret_espera` 2 mm depois da purga (o mesmo do `PAUSE_PARK_RETRACT_LENGTH` padrão do Marlin; 3 mm foi descartado por cautela com plástico derretido subindo para a zona fria durante a espera); no `RETOMA_TROCA`, já no ponto, devolve `ret_espera − 1 − ret_slicer` (0.2 mm) antes do `RESUME`. Com o `RESUME` (+1) e o `G1 E.8` do G-code, a conta fecha em zero. Instalar sem impressão rodando: upload por cima do `macros.cfg` e Salvar e reiniciar; depois atualizar o snapshot e apagar `to-do/macros-v2-PARA-INSTALAR.cfg`. Atenção: `printers/frank-pro/klipper/macros.cfg` é o snapshot do que já está na impressora (v1); colar ele não muda nada (aconteceu em 2026-10-19 00:54).
+- contorno manual enquanto a v2 não entra: depois de limpar o bico e antes de clicar Retomar, `M83` e `G1 E-0.8 F2100` no console (tira a sobra de 0.8 mm).
+- testar `PREAQUECE_BICO` com o bico já quente (o alvo deve continuar no valor atual)
+
 - máquina: Frank Pro
 - prioridade: média
 - atualizado: 2026-10-18
@@ -188,133 +205,16 @@ Movimento em Z (sem risco de bater na peça):
 - purga (`CARREGA_TROCA`): anda só em XY, na altura de estacionamento;
 - volta (`RETOMA_TROCA`): XY no alto, depois desce na vertical. Não usar o `RESUME` direto nesta troca: ele volta em diagonal, descendo enquanto anda, e chega rente ao topo da peça.
 
-## Instalação (o usuário, no Mainsail, com a impressora parada)
-1. Máquina (Machine) → pasta de config → criar o arquivo `macros.cfg` e colar o bloco abaixo inteiro.
+## Instalação (feita em 2026-10-18; registro para reinstalar)
+1. Máquina (Machine) → lista de arquivos de config (onde estão `printer.cfg` e `mainsail.cfg`) → upload do `macros.cfg` (feito em 2026-10-18; fonte atual: `printers/frank-pro/klipper/macros.cfg`).
 2. Abrir o `printer.cfg` e, logo abaixo de `[include mainsail.cfg]`, acrescentar a linha `[include macros.cfg]`.
 3. "Salvar e reiniciar". Isso reinicia o Klipper: fazer só sem impressão rodando.
 4. Avisar o agente, que confere por GET se as macros carregaram e então:
-   - troca no start G-code do preset `Frank Pro 0.4 nozzle Speed` (repo e Orca) o `M104 S170` por `PREAQUECE_BICO S=170`. Só depois da instalação: sem a macro, o Klipper para a impressão com comando desconhecido;
+   - troca no start G-code do preset `Frank Pro 0.4 nozzle Speed` (repo e Orca) o `M104 S170` por `PREAQUECE_BICO S=170` (FEITO em 2026-10-18, conferido num fatiamento). Sem a macro, o Klipper para a impressão com comando desconhecido;
    - atualiza os snapshots em `printers/frank-pro/klipper/` (incluindo `macros.cfg`) e o projeto web.
 
 ## Arquivo `macros.cfg`
-```ini
-# Macros da Frank Pro. Incluido pelo printer.cfg com [include macros.cfg].
-
-# ---------- Pre-aquecimento ----------
-# Usado no start G-code no lugar de M104 S170: nao derruba um bico que ja esta mais quente.
-[gcode_macro PREAQUECE_BICO]
-description: Pre-aquece o bico so se o alvo atual for menor que S (padrao 170)
-gcode:
-  {% set alvo = params.S|default(170)|float %}
-  {% if printer.extruder.target < alvo %}
-    M104 S{alvo}
-  {% endif %}
-
-# ---------- Troca de filamento estilo Marlin ----------
-# Canto superior esquerdo (X min., Y max.) = estacionar; inferior esquerdo = purgar.
-# Coordenadas na borda da area de 220 x 220; ajuste aqui se a purga cair em cima da peca.
-[gcode_macro M600]
-description: Troca de filamento: pausa, estaciona no canto sup. esquerdo e descarrega
-variable_park_x: 0
-variable_park_y: 220
-variable_purge_x: 0
-variable_purge_y: 0
-variable_lift: 10          ; mm acima da posicao atual (minimo 20 mm de altura absoluta)
-variable_unload: 50        ; mm de descarga; UNLOAD=0 pula
-variable_pos_x: 0          ; posicao da pausa, gravada pelo M600 para o RETOMA_TROCA
-variable_pos_y: 0
-variable_pos_z: 0
-gcode:
-  {% if printer.pause_resume.is_paused %}
-    {action_raise_error("M600: impressao ja esta pausada")}
-  {% endif %}
-  {% set z = [printer.gcode_move.gcode_position.z + lift, 20]|max %}
-  {% set unload_mm = params.UNLOAD|default(unload)|float %}
-  {% set pos = printer.gcode_move.gcode_position %}
-  SET_GCODE_VARIABLE MACRO=M600 VARIABLE=pos_x VALUE={pos.x}
-  SET_GCODE_VARIABLE MACRO=M600 VARIABLE=pos_y VALUE={pos.y}
-  SET_GCODE_VARIABLE MACRO=M600 VARIABLE=pos_z VALUE={pos.z}
-  # PAUSE do mainsail.cfg restaura este valor no RESUME
-  SET_GCODE_VARIABLE MACRO=RESUME VARIABLE=restore_idle_timeout VALUE={printer.configfile.settings.idle_timeout.timeout}
-  SET_IDLE_TIMEOUT TIMEOUT=1800
-  PAUSE X={park_x} Y={park_y} Z_MIN={z}
-  {% if unload_mm > 0 and printer.extruder.can_extrude %}
-    SAVE_GCODE_STATE NAME=m600_unload
-    M83
-    G1 E10 F300
-    G1 E-{unload_mm} F1800
-    RESTORE_GCODE_STATE NAME=m600_unload
-  {% endif %}
-  RESPOND TYPE=command MSG="action:prompt_begin Troca de filamento"
-  RESPOND TYPE=command MSG="action:prompt_text Tire o filamento (alavanca do Sprite), coloque o novo ate o extrusor puxar e confirme."
-  RESPOND TYPE=command MSG="action:prompt_footer_button Carregar e purgar|CARREGA_TROCA|primary"
-  RESPOND TYPE=command MSG="action:prompt_show"
-
-[gcode_macro CARREGA_TROCA]
-description: Troca de filamento: purga no canto inf. esquerdo e volta a estacionar (L=mm, padrao 50)
-gcode:
-  {% set m = printer["gcode_macro M600"] %}
-  RESPOND TYPE=command MSG="action:prompt_end"
-  {% if not printer.pause_resume.is_paused %}
-    {action_raise_error("CARREGA_TROCA: so durante a pausa do M600")}
-  {% endif %}
-  {% if not printer.extruder.can_extrude %}
-    {action_raise_error("CARREGA_TROCA: bico frio; aqueca com M109 e rode de novo")}
-  {% endif %}
-  SAVE_GCODE_STATE NAME=m600_load
-  G90
-  G1 X{m.purge_x} Y{m.purge_y} F6000
-  M83
-  G1 E{params.L|default(50)|float} F180
-  G1 E-1 F2100               ; o RESUME desfaz 1 mm
-  G4 P2000
-  G1 X{m.park_x} Y{m.park_y} F6000
-  RESTORE_GCODE_STATE NAME=m600_load
-  RESPOND TYPE=command MSG="action:prompt_begin Troca de filamento"
-  RESPOND TYPE=command MSG="action:prompt_text Purga feita. Limpe o bico com pinca e retome, ou purgue mais."
-  RESPOND TYPE=command MSG="action:prompt_button Purgar mais 20 mm|CARREGA_TROCA L=20|secondary"
-  RESPOND TYPE=command MSG="action:prompt_footer_button Retomar|RETOMA_TROCA|primary"
-  RESPOND TYPE=command MSG="action:prompt_show"
-
-[gcode_macro RETOMA_TROCA]
-description: Troca de filamento: volta como o Marlin (XY alto, desce na vertical) e retoma
-gcode:
-  {% set m = printer["gcode_macro M600"] %}
-  RESPOND TYPE=command MSG="action:prompt_end"
-  {% if not printer.pause_resume.is_paused %}
-    {action_raise_error("RETOMA_TROCA: nao ha pausa do M600 para retomar")}
-  {% endif %}
-  G90
-  G1 X{m.pos_x} Y{m.pos_y} F6000   ; XY primeiro, ainda na altura de estacionamento
-  G1 Z{m.pos_z} F600               ; desce na vertical ate o ponto da pausa
-  RESUME                           ; desfaz 1 mm no proprio ponto e continua (ja esta na posicao salva)
-
-# ---------- Posicionamento ----------
-[gcode_macro CENTRO]
-description: Bico no centro da mesa, 5 mm acima
-gcode:
-  {% if "xyz" not in printer.toolhead.homed_axes %}
-    G28
-  {% endif %}
-  G90
-  G1 Z5 F600
-  G1 X110 Y110 F6000
-
-[gcode_macro CANTO]
-description: Bico sobre o parafuso N (1 frente-esq, 2 frente-dir, 3 tras-dir, 4 tras-esq), 5 mm acima
-gcode:
-  {% set pts = [[20, 29], [195, 29], [195, 198], [20, 198]] %}
-  {% set n = params.N|default(1)|int %}
-  {% if n < 1 or n > 4 %}
-    {action_raise_error("CANTO: use N=1, 2, 3 ou 4")}
-  {% endif %}
-  {% if "xyz" not in printer.toolhead.homed_axes %}
-    G28
-  {% endif %}
-  G90
-  G1 Z5 F600
-  G1 X{pts[n-1][0]} Y{pts[n-1][1]} F6000
-```
+Instalado na impressora; o snapshot fica em `printers/frank-pro/klipper/macros.cfg` (conferido idêntico ao enviado). Contém `PREAQUECE_BICO`, `M600`, `CARREGA_TROCA`, `RETOMA_TROCA`, `CENTRO` e `CANTO`. Mudanças futuras: o usuário edita no Mainsail e o snapshot é atualizado com `--param cfg --file macros.cfg`.
 
 ## Como inserir a troca na impressão
 - **Pelo console, sem editar o G-code** (preferido): com a impressão rodando, `SET_PAUSE_AT_LAYER LAYER=<n> MACRO=M600`, onde n é a primeira camada da cor nova, como no preview do Orca. Funciona porque a impressora Speed emite `SET_PRINT_STATS_INFO CURRENT_LAYER=<n>` antes de subir para a camada n. É uma troca por comando; repita depois de cada troca.
@@ -445,7 +345,7 @@ gcode:
 
 <!-- fonte: to-do/pla-speed-validacao.md -->
 # Validar o PLA Speed numa impressão real
-- status: em andamento; teste curto do casco (2026-10-18)
+- status: PAUSADO por decisão do usuário (2026-10-18: "chega de benchy"). Benchy oco reproduz o defeito; o teste de PA 0.025 ficou pronto e não foi impresso
 - máquina: Frank Pro
 - prioridade: alta
 - atualizado: 2026-10-18
@@ -486,14 +386,41 @@ gcode:
 - STL `../projects/calibracao/teste-casco-overhang-duplo.stl`: dois cascos com proa em V de ponta arredondada (raio 2.5 mm; no Benchy o G-code dá 2.4–2.7 mm) e overhang de 45°, laterais abrindo ~32°, popa reta com quinas vivas; base 0–1 mm, abertura 1–6 mm, topo 6–7 mm. A cópia de baixo (Y menor) tem a proa em +X; a de cima é a mesma peça girada 180°.
 - 1ª versão (proa em V viva) cancelada: a costura `aligned` foi para a ponta da proa. Na versão arredondada, a costura vai para uma quina da popa nas duas cópias, como no Benchy (conferido no fatiamento pelo CLI).
 - fatiado no Orca pelo usuário: ~14m50s, 35 camadas, PLA Speed 225 °C, PA 0.038, mesa 65/60 °C, fan 30–40% (overhang 80% acima de 50%); na abertura, parede externa a 53–60 mm/s e fan de 39%, como na faixa do defeito do Benchy.
+- variante do usuário (2026-10-18): `teste-casco-overhang-simples.stl`, modelo novo feito por ele, uma cópia só, com o trecho reto do casco mais longo (41.3 × 20.25 × 7 mm; base ~35 mm). No G-code: proa avança ~1.06 mm/mm (~47°), laterais abrem ~0.62 mm/mm por lado (~32°), como no original; proa para −X; G-code `teste-casco-overhang-simples_PLA_10m52s.gcode` (10m52s, já com `PREAQUECE_BICO`). Com uma cópia a camada fica em ~8 s e o slowdown de refrigeração baixa paredes internas e infill de 90 para 64 mm/s; a parede externa segue a 56–60 mm/s. Depois, repetir com a peça girada 180°.
 - leitura:
   - defeito no lado virado para a frente nas DUAS cópias → causa ligada à máquina/posição (ar, movimento);
   - defeito no MESMO lado da peça nas duas → causa ligada ao fatiamento (ordem/sentido dos caminhos);
   - defeito dos dois lados → refrigeração geral;
   - sem defeito → o teste não reproduz o Benchy (camada de ~9 s contra ~31 s); voltar ao Benchy cortado.
 
+### Teste casco diagonal (`teste-casco-diagonal-overhang-simples_PLA_17m36s.gcode`), 2026-10-18 — LIMPO
+- modelo do usuário: proa arredondada em overhang de Z ~2 a 10.8 (~0.87 mm/mm, ~41°), laterais abrindo ~0.37 mm/mm por lado (~20°), topo em diagonal; proa para −X; costura na quina da popa
+- mesmas condições de material: 225 °C, PA 0.038, fan de 38–39% na ponta o overhang inteiro, ponta a 37–60 mm/s, SCV 5; tempo real de camada 16–34 s entre as camadas 30 e 50 (Benchy 00005E: ~31 s entre 25 e 48). Correção: a comparação "~31 s × ~8 s" feita antes misturava tempo real com estimativa sem aceleração (estimativas: Benchy 9–15 s, teste ~8 s); o tempo de camada não é uma diferença grande.
+- 18m32s; resultado "excelente", sem calombos na proa nem nas laterais
+- descartado no klippy.log: `print_stall` ficou em 0 em todas as impressões desde o RESTART de 2026-10-18 20:20 (Benchy 00005E incluído). Não houve micro-paradas por fila vazia.
+- conclusão: PA 0.038 + 225 °C + fan 39% num overhang de proa arredondada a ~41° não bastam para causar o defeito.
+
+### O que ainda diferencia o Benchy do teste
+- abertura das laterais: Benchy ~31° (0.6 mm/mm por lado) × teste ~20°
+- sentido de impressão em relação à peça: no Benchy (proa +X) a face da frente, a defeituosa, é impressa no sentido +X, da popa para a proa (G-code: 100% dos segmentos +X em Z 3–8); a face de trás vai −X, da proa para a popa. No teste (proa −X), a face da frente vai da proa para a popa. Velocidade (47–60 mm/s) e fan (39%) são iguais nas duas faces do Benchy.
+- curvatura composta do casco
+
+### Benchy oco (`3dbenchy-overhang-only.stl`, `3dbenchy-overhang-only_PLA_30m13s.gcode`), 2026-10-18 — preparado pelo usuário
+- só o casco do Benchy, sem nada dentro; Z até 27.4 mm, 137 camadas, 30m13s; mesmos presets (PREAQUECE_BICO, 225 °C, PA 0.038, fan 30–40%)
+- contorno externo idêntico ao Benchy 00005E em Z 3–9 (caixa igual com diferença ≤ 0.1 mm); proa para +X, como no Benchy
+- face da frente igual ao Benchy: fan 39%, 49–60 mm/s, impressa no sentido +X (popa → proa)
+- diferença: com a parede fina, o Orca aplica o fan de overhang de 80% na ponta da proa em Z 3–7 (no Benchy, 39% a partir de Z 5). Se a proa sair limpa, isso não absolve a refrigeração na proa; a comparação válida é a face da frente.
+- diferença: a ordem/costura muda (há também o contorno interno do casco oco)
+- resultado (job 000063, cancelado na camada 65, Z 13, aos 20m54s): REPRODUZIU, "mesmo defeito" do Benchy segundo o usuário. O defeito depende da geometria externa do casco do Benchy, não do que há dentro. Como a ponta teve fan de 80% em Z 3–7 e o defeito veio mesmo assim, a refrigeração perde força como causa.
+
+### Teste PA 0.025 no Benchy oco — próximo (uma variável)
+- hipótese do usuário: PA 0.038 alto
+- G-code `3dbenchy-overhang-only_PLA_30m13s_PA0025.gcode`: cópia exata do teste anterior com uma linha trocada (`SET_PRESSURE_ADVANCE ADVANCE=0.038` → `0.025`, linha 529); o preset não foi alterado
+- comparar a mesma faixa (Z 3–10) e a mesma face; se melhorar, refazer a leitura da torre (sulco) e só então mudar o preset
+
+
 ## Próximos passos
-1. Imprimir o casco curto (`RESTART` antes e conferir `--param limites`). Foto das quatro faces das duas cópias.
+1. Reproduzir antes de isolar: mesmo modelo diagonal, com a proa para +X (como no Benchy) e laterais abrindo ~31°. Se reproduzir, voltar a mudar uma coisa por vez (ângulo × sentido); se não, o próximo suspeito é o tempo de camada/curvatura do Benchy.
 2. Conforme a leitura, uma variável por vez no PLA Speed: fan (30–40% → mais alto) ou temperatura (225 → 215, refazendo a vazão no ar a 8 mm³/s).
 3. Sempre `RESTART` depois de torre ou teste com `SET_VELOCITY_LIMIT`, e conferir com `--param limites` antes de imprimir.
 
