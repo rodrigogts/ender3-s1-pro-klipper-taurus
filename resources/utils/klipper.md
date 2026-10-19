@@ -106,7 +106,19 @@ G1 Z0.1 F300                 ; teste do papel (Z0 = bico encostando, pelo z_offs
 - Atalhos (`macros.cfg`): `CENTRO` e `CANTO N=1..4` sobem a 5 mm e levam o bico ao centro ou ao parafuso N; com `FOLHA=1`, descem até Z0.1. `SOLTA_XY` desliga só X e Y para mover o bico com a mão (o Z fica travado); rodar `G28 X Y` antes de mover pelo Klipper.
 
 ## Troca de filamento (cor por camada, Klipper)
-Com a impressora Speed, o "Add color change" da barra de camadas do Orca gera `M600`, a troca estilo Marlin do `macros.cfg`. Outros jeitos de chamar: `SET_PAUSE_AT_LAYER LAYER=<n> MACRO=M600` no console, ou `M600` no G-code depois de `SET_PRINT_STATS_INFO CURRENT_LAYER=<n>`. Daí em diante, seguir a janela do Mainsail (Carregar e purgar → Retomar). Detalhes em `to-do/macros-klipper.md`.
+Com a impressora Speed, o "Add color change" da barra de camadas do Orca gera `M600`, a troca estilo Marlin do `macros.cfg`. Outros jeitos de chamar: `SET_PAUSE_AT_LAYER LAYER=<n> MACRO=M600` no console, ou `M600` no G-code depois de `SET_PRINT_STATS_INFO CURRENT_LAYER=<n>`. Daí em diante, seguir a janela do Mainsail (Carregar e purgar → Retomar).
+
+Fluxo do `M600`:
+1. Põe o idle_timeout em 1800 s, roda o `PAUSE` (salva posição, retrai 1 mm, sobe o Z e estaciona em X0 Y220), descarrega 50 mm e abre a janela "Troca de filamento".
+2. Tirar o filamento (alavanca do Sprite), colocar o novo até o extrusor puxar e clicar **Carregar e purgar** (`CARREGA_TROCA`): purga 50 mm em X0 Y0, retrai 2 mm e volta a X0 Y220.
+3. **Purgar mais** (`CARREGA_TROCA L=20`) ou **Retomar** (`RETOMA_TROCA`): XY no alto até o ponto da pausa, desce na vertical, devolve o que falta da retração e roda o `RESUME`. Sem gotinha.
+
+Limites do `M600`:
+- Passou de 30 min na troca, o idle_timeout desliga heaters e motores, o home se perde e a impressão não retoma.
+- A pausa mantém o alvo do bico. Para outro material, `M109 S<nova>` antes de "Carregar e purgar"; o PA e o fan continuam os do filamento fatiado.
+- 50 mm podem não tirar todo o filamento do Sprite: terminar puxando com a alavanca pressionada.
+- Se a janela não aparecer, rodar `CARREGA_TROCA` e `RETOMA_TROCA` no console.
+- X0 Y0 e X0 Y220 são cantos da área de impressão: peça ocupando esses cantos pede mudar `purge_*`/`park_*` no `macros.cfg`.
 
 Troca manual, sem o `M600` (alternativa):
 
@@ -145,7 +157,7 @@ Depois:
 Por que funciona:
 - O `PAUSE` salva a posição. Sem parâmetros, ele estaciona atrás à direita, 2 mm acima da peça; com `X= Y= Z_MIN=`, vai para onde for pedido.
 - O `RESUME` faz unretract de 1 mm e volta ao ponto salvo. A extrusão manual durante a pausa não bagunça a posição do E.
-- Em Z: o `PAUSE` sobe primeiro e depois anda em XY. O `RESUME` volta em diagonal, descendo enquanto anda: nunca fica abaixo do topo da peça, mas chega rente a ele. A macro `RETOMA_TROCA` (proposta) volta como o Marlin, com XY no alto e depois descida vertical.
+- Em Z: o `PAUSE` sobe primeiro e depois anda em XY. O `RESUME` volta em diagonal, descendo enquanto anda: nunca fica abaixo do topo da peça, mas chega rente a ele. A `RETOMA_TROCA` do `M600` volta como o Marlin, com XY no alto e depois descida vertical.
 
 Cuidados:
 - O `RESUME` só espera o bico reaquecer se o idle_timeout disparou durante a pausa. Mas se ele disparou, o `M84` já desligou os motores e o `RESUME` falha por falta de home. Por isso o `SET_IDLE_TIMEOUT` vai antes da troca.
