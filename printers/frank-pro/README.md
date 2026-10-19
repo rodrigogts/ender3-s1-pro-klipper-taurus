@@ -8,6 +8,7 @@ Legenda: VALIDADO = medido ou testado na máquina; PENDENTE = ainda não feito; 
 - extrusor: Sprite Pro (direct drive, gear_ratio 42:12)
 - bico: 0.4 mm original; bico CHT MK8 0.4 latão + núcleo CuCrZr pedido, vindo da China, não instalado (`to-do/bico-cht.md`)
 - cooling: Taurus dual 5015; sopra muito mais que o stock, percentuais de fan não equivalem aos de perfis stock
+- superfície: PEI texturizado, sem adesivo
 - probe: CR Touch (seção [bltouch]), x_offset -31.8, y_offset -40.5
 - host: Raspberry Pi 3B, MainsailOS 3.0.0, Mainsail, Moonraker v0.11.0-3
 - MCU: STM32F401RCT6, ligada ao Pi por USB (`/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0`)
