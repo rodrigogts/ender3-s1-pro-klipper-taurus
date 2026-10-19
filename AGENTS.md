@@ -70,6 +70,7 @@ Ferramenta padrão de consulta e diagnóstico: `scripts/frank-pro.mjs` (Node 18+
 - Pause G-code: `PAUSE`. Change filament G-code: `M600` na impressora Speed (o "Add color change" do Orca gera `M600`) e `PAUSE` na Frank Pro normal.
 - `M600` é a macro estilo Marlin do `macros.cfg` (validada): troca de cor por camada guiada por janelas no Mainsail. Detalhes em `resources/utils/klipper.md`.
 - O start G-code da impressora Speed usa `PREAQUECE_BICO S=170` (macro do `macros.cfg`): sem esse arquivo na impressora, a impressão para com comando desconhecido.
+- O processo `0.20mm Standard @Taurus Speed` tem `exclude_object` ligado: o G-code sai com `EXCLUDE_OBJECT_DEFINE`, que exige `[exclude_object]` no printer.cfg. Sem a seção, a impressão para com comando desconhecido.
 - O start G-code da Speed espera temperatura com `TEMPERATURE_WAIT` (MIN = alvo; MAX = alvo +3 na mesa, +8 no bico), não com `M190`/`M109`, que no Klipper esperam a temperatura estabilizar e somam ~1,5 min por impressão com o pico do PID. Manter `M140`/`M104` no start, senão o Orca insere `M190`/`M109` sozinho.
 - Não ativar firmware retraction sem `[firmware_retraction]`.
 - Nunca editar os presets de sistema nem os personalizados originais (`Frank Pro 0.4 nozzle`, `0.20mm Standard @Taurus`, filamentos sem "Speed"). Trabalhar nos overrides Speed.

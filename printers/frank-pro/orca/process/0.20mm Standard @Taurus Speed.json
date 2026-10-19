@@ -4,6 +4,7 @@
 	"bridge_speed": "15",
 	"brim_type": "outer_only",
 	"default_acceleration": "1600",
+	"exclude_object": "1",
 	"from": "User",
 	"inherits": "0.20mm Standard @Creality Ender3S1Pro",
 	"initial_layer_acceleration": "650",
