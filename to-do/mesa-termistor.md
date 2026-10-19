@@ -2,13 +2,14 @@
 - status: aberto; contornado, porque a mesa a 105 °C fica estável
 - máquina: Frank Pro
 - prioridade: alta (segurança térmica)
-- atualizado: 2026-10-18
+- atualizado: 2026-10-19
 
 ## Fatos
 - 2026-10-17: duas impressões abortadas no aquecimento com `Heater heater_bed not heating at expected rate`
 - leitura entre 95 e 97 °C com potência 100%: quedas de ~7 °C em 7 s e saltos de +3.8 a +6.2 °C em 1 s. Fisicamente impossível, então é falha de medição. Saltos menores já apareciam em sessões anteriores.
 - o borne parafusado foi aberto: sem solda solta, tudo normal. Num aquecimento só da mesa depois disso, os saltos voltaram entre 95 e 97 °C, mas passou e ficou estável a 105 °C.
 - impressão de 3h26m a 105 °C: estável (±0.02 °C), zero saltos acima de 1.5 °C/s
+- 2026-10-19 (job 000069): aquecimento de 45 a 105 °C em ~4 min, amostrado a cada ~2 s, sem salto nem queda; 95→97 °C a ~0,2 °C/s, com potência de 100%. Defeito intermitente: um aquecimento limpo não fecha o item.
 - sensor: EPCOS 100K B57560G104F, no pino PC4
 
 ## Hipóteses
