@@ -7,6 +7,7 @@ Quando o bico CHT for instalado, refazer vazão no ar e torre de PA.
 
 ### Mecânica
 - rotation_distance 26.359: VALIDADO 2026-10-17 (100 mm pedidos a F60, 100.0 mm entraram; medido com a haste do paquímetro)
+- z_offset, 2026-10-19, método manual (papel em Z=0.1 no centro, babystep + `Z_OFFSET_APPLY_PROBE`): bico 245 °C e mesa 105 °C ligados → 0.995; depois do restart, com os alvos zerados e o bico esfriando → 1.070 (~190 °C) e 1.095 (~120 °C). O valor sobe conforme o bico esfria (a doc do Klipper cita ~0,1 mm de dilatação do bico). Medir sempre quente, na mesma temperatura.
 - cubos xyz A/B, 2026-10-16: aceleração 650–2000 mm/s² × 500 mm/s² saíram iguais, logo a aceleração não causava o arredondamento das arestas verticais. Faces 20.00 mm, cantos 20.20 mm com PA 0: o canto saltado era falta de PA.
 
 ### PETG XT / Tritan HT 3D Fila (filamento `Creality Taurus PETG XT Speed`)

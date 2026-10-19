@@ -33,7 +33,7 @@ SET_HEATER_TEMPERATURE HEATER=heater_bed TARGET=105
 TEMPERATURE_WAIT SENSOR=heater_bed MINIMUM=100           ; espera só chegar; aceita MAXIMUM=
 TURN_OFF_HEATERS
 ```
-- A mesa tem `max_temp` 110, então o máximo prático é ~105 °C.
+- A mesa tem `max_temp` 110, então o máximo prático é 105 °C. Alvo de 110 °C derruba a MCU com `ADC out of range`: o PID passa um pouco do alvo e a leitura sai da faixa. Depois, `FIRMWARE_RESTART`.
 - `M109`/`M190` só liberam com a temperatura estável (±1 °C e < 0,1 °C/s). Na Frank Pro, o bico 170 → 225 passa a ~229 °C e só libera ~40 s depois de chegar; a mesa → 65 passa a ~66 °C e libera ~50 s depois. O start G-code da Speed usa `TEMPERATURE_WAIT`, que libera ao chegar.
 - O idle_timeout é de 600 s. Quando dispara, desliga os heaters e roda M84. Pra pausa longa: `SET_IDLE_TIMEOUT TIMEOUT=1800`.
 
@@ -73,7 +73,8 @@ SAVE_CONFIG
 PROBE_ACCURACY
 BLTOUCH_DEBUG COMMAND=reset             ; pino travado ou piscando
 ```
-- O z_offset atual é 0.990, do SAVE_CONFIG de 2026-10-18.
+- `RESTART`, `FIRMWARE_RESTART` e `SAVE_CONFIG` zeram os alvos de temperatura: reaqueça antes de conferir o z_offset com o papel.
+- O z_offset medido muda com a temperatura do bico (~0,1 mm entre 245 °C e ~120 °C, ver `printers/frank-pro/calibracao.md`): medir e conferir sempre na mesma temperatura.
 - Trocar o bico muda o z_offset, então refaça depois da troca.
 
 ## Mesh e nivelamento

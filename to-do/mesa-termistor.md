@@ -10,6 +10,7 @@
 - o borne parafusado foi aberto: sem solda solta, tudo normal. Num aquecimento só da mesa depois disso, os saltos voltaram entre 95 e 97 °C, mas passou e ficou estável a 105 °C.
 - impressão de 3h26m a 105 °C: estável (±0.02 °C), zero saltos acima de 1.5 °C/s
 - 2026-10-19 (job 000069): aquecimento de 45 a 105 °C em ~4 min, amostrado a cada ~2 s, sem salto nem queda; 95→97 °C a ~0,2 °C/s, com potência de 100%. Defeito intermitente: um aquecimento limpo não fecha o item.
+- 2026-10-19 ~16h: `MCU shutdown: ADC out of range` com alvo de 110 °C (= `max_temp`). Subida lisa até 110,0 °C (~0,2 °C/s, sem salto); é o limite de configuração, não este defeito.
 - sensor: EPCOS 100K B57560G104F, no pino PC4
 
 ## Hipóteses

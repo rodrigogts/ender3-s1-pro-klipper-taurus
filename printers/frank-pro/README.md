@@ -30,7 +30,7 @@ Legenda: VALIDADO = medido ou testado na máquina; PENDENTE = ainda não feito; 
 - extruder: rotation_distance 26.359 (VALIDADO 2026-10-17), pressure_advance 0, max_extrude_only_distance 50, max_temp 300
 - heater_bed: max_temp 110; por isso a mesa roda no máximo a ~105 °C
 - PID hotend: 21.897 / 1.043 / 114.961; PID mesa: 73.604 / 1.478 / 916.366
-- bltouch z_offset: 0.990 (SAVE_CONFIG)
+- bltouch z_offset: 1.095 (SAVE_CONFIG 2026-10-19, medido com o bico esfriando a ~120 °C; a 245 °C o mesmo método deu 0.995, ver `calibracao.md`)
 - bed_mesh: perfil `default`, 4x4, bicubic, área 10,10 a 200,194
 - idle_timeout: 600 s (padrão); ao disparar roda TURN_OFF_HEATERS e M84
 - macros: as do `mainsail.cfg` + `macros.cfg` (incluído pelo printer.cfg); não há `_CLIENT_VARIABLE`, então vale idle_timeout 0 nas macros do mainsail.cfg
