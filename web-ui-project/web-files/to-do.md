@@ -20,9 +20,10 @@ Regras:
 | [abs-calibracao.md](abs-calibracao.md) | Frank Pro | pendente | baixa | Criar o ABS Speed e calibrar temperatura, vazão e PA do ABS |
 | [speed-como-padrao.md](speed-como-padrao.md) | Frank Pro | decisão pendente | baixa | Tornar o Speed o perfil padrão: por material, conforme for validado, ou renomear tudo no fim |
 | [trilhos-lineares.md](trilhos-lineares.md) | Frank Pro | decisão tomada: não agora | baixa | Trilhos lineares XYZ: sem ganho comprovado na S1 Pro; reabrir só com evidência de folga ou ringing |
-| [macros-klipper.md](macros-klipper.md) | Frank Pro | v2 instalada, falta ver numa troca | baixa | `macros.cfg`: `M600` estilo Marlin validado; v2 (sem gotinha na retomada) instalada em 2026-10-19. Falta ver a v2 numa troca real e testar `PREAQUECE_BICO` com bico quente |
+| [macros-klipper.md](macros-klipper.md) | Frank Pro | validado; falta 1 teste | baixa | `macros.cfg`: `M600` estilo Marlin e v2 (sem gotinha) validados em 2026-10-18/19. Falta só testar `PREAQUECE_BICO` com o bico já quente |
 | [stray-kids-logo.md](stray-kids-logo.md) | Frank Pro | impressão pendente | baixa | Logo em 3 cores montado no Tinkercad; procedimento de troca de cor com PAUSE |
 | [orca-bundle-export.md](orca-bundle-export.md) | Frank Pro | pendente | baixa | Reexportar o `.orca_printer` (o atual é de 2026-10-05, sem os Speed) |
+| [armazenamento-filamento.md](armazenamento-filamento.md) | geral | sacos a caminho; sílica em teste | baixa | 20 sacos a vácuo PA+PE 32 × 34 cm (chegam até 24/10; os atuais perdem vácuo) e sílica laranja regenerável (testando 65 °C no secador; o usual é ~100–120 °C) |
 | [cli-fatiamento-helper.md](cli-fatiamento-helper.md) | Frank Pro | ideia | baixa | Script para fatiar pelo CLI do Orca (torres, comparações) com as correções já conhecidas |
 
 Ordem sugerida na Frank Pro: mesa-termistor e pi-fonte (confiabilidade) → pla-speed-validacao → petg-max-flowrate → bico-cht → input-shaper-adxl. O bico CHT, quando chegar, vem antes do max flowrate, porque o limite muda com ele.
@@ -54,6 +55,34 @@ Ordem sugerida na Frank Pro: mesa-termistor e pi-fonte (confiabilidade) → pla-
 
 ## Fecha quando
 - ABS Speed com temperatura e PA medidos e um Benchy aprovado.
+
+<!-- fonte: to-do/armazenamento-filamento.md -->
+# Armazenamento de filamento: sacos a vácuo novos e sílica regenerável
+- status: sacos comprados, a caminho; sílica comprada, regeneração em teste
+- máquina: geral (todos os filamentos)
+- prioridade: baixa
+- atualizado: 2026-10-19
+
+## Fatos
+- sacos atuais perdem o vácuo; causa não identificada
+- comprados (Mercado Livre, internacional): 20 sacos a vácuo para filamento, 32 × 34 cm (cabem carretéis de 1 kg), material PA+PE, lado preto opaco à luz e lado transparente com etiqueta para material e data
+  - entrega prevista entre 2026-10-05 e 2026-10-24; em 2026-10-17 saiu do centro de distribuição de Campinas (J&T)
+- sílica gel regenerável laranja comprada; alguns saquinhos ficaram escuros (verde-escuro/preto = saturada; laranja = seca)
+- regeneração usual da sílica: ~100–120 °C por 1–3 h (conferir na embalagem). Os secadores de filamento chegam a ~55–70 °C, o que regenera devagar e só em parte.
+- teste em andamento (2026-10-19): saquinhos no secador a 65 °C por várias horas, para não arriscar o material do saquinho no forno
+
+## Hipóteses (sacos perdendo vácuo)
+- vazamento na válvula ou no zíper (sujeira/pó de filamento na vedação, zíper não fechado de ponta a ponta)
+- furo pela ponta solta do filamento ou pela borda do carretel
+- saco só de PE é mais permeável e fura mais fácil; o PA+PE (nylon + PE) é barreira melhor e mais resistente a perfuração
+
+## Próximos passos
+1. Ver a cor da sílica depois do secador: voltou a laranja → resolvido; só clareou → regenerar os grãos fora do saquinho no forno a ~100 °C.
+2. Quando os sacos chegarem: prender a ponta do filamento no carretel antes de ensacar, limpar o zíper, fechar de ponta a ponta, sílica seca dentro e etiqueta com material e data.
+3. Conferir depois de alguns dias se o vácuo se mantém. Mesmo sem vácuo, saco PA+PE bem fechado com sílica seca já protege da umidade.
+
+## Fecha quando
+- Filamentos guardados nos sacos novos com sílica regenerada, e o vácuo se mantendo (ou decidido que não importa).
 
 <!-- fonte: to-do/bico-cht.md -->
 # Trocar para o bico CHT (maior vazão)
@@ -154,7 +183,7 @@ O estado completo, as hipóteses e o plano estão em `printers/frank-mini/README
 
 <!-- fonte: to-do/macros-klipper.md -->
 # Macros: troca de filamento estilo Marlin (M600), posicionamento do bico e pré-aquecimento
-- status: M600 VALIDADO em 2026-10-18; v2 (correção da gotinha) INSTALADA em 2026-10-19 e conferida (arquivo idêntico, ret_espera 2, ret_slicer 0.8); falta ver a v2 numa troca real e testar `PREAQUECE_BICO` com bico quente
+- status: M600 e v2 VALIDADOS (v2 em 2026-10-19: retomada sem gotinha, sem console); falta só testar `PREAQUECE_BICO` com bico quente
 
 ## Teste real, 2026-10-18 (job da placa do R, `teste-placa-20x20-letra-R_PLA_3m37s.gcode`)
 - `M600` inserido no Orca como custom G-code na camada 6: no G-code, logo depois de `SET_PRINT_STATS_INFO CURRENT_LAYER=6` e antes da subida para a camada
