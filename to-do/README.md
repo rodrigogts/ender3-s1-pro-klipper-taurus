@@ -11,7 +11,7 @@ Regras:
 |---|---|---|---|---|
 | [mesa-termistor.md](mesa-termistor.md) | Frank Pro | aberto | alta | Termistor da mesa com leitura errática entre 95 e 97 °C que desarmou o verify_heater duas vezes. Suspeita no lado quente; medir ~100 kΩ mexendo o cabo |
 | [pi-fonte.md](pi-fonte.md) | Frank Pro | comprada, teste pendente | alta | Fonte nova do Pi: confirmar que somem o "Previously Under-Volted" e a queda do USB da MCU |
-| [pla-speed-validacao.md](pla-speed-validacao.md) | Frank Pro | em andamento | alta | Benchy PLA Speed com calombos na proa e numa lateral (Z 5–10), pior com SCV 5; o SCV 1 só atenuava. Teste curto de casco duplo (15 min) para separar refrigeração × direção |
+| [pla-speed-validacao.md](pla-speed-validacao.md) | Frank Pro | pausado | média | Calombos no overhang do casco do Benchy em PLA Speed (Z 5–10). O casco oco reproduz em ~12 min; o teste com PA 0.025 está pronto (G-code editado) e não foi impresso. Peças sem overhang daquele tipo imprimem bem |
 | [petg-max-flowrate.md](petg-max-flowrate.md) | Frank Pro | pendente | média | Max flowrate do PETG XT a 270 °C e limite de ~85% no `filament_max_volumetric_speed` |
 | [bico-cht.md](bico-cht.md) | Frank Pro | pedido, em trânsito | média | Bico CHT 0.4 latão + CuCrZr para mais vazão; depois de instalar, refazer z_offset, vazão e PA |
 | [input-shaper-adxl.md](input-shaper-adxl.md) | Frank Pro | pendente | média | ADXL345 + Input Shaper medido na própria máquina antes de subir acelerações |
