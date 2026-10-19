@@ -1,5 +1,5 @@
 # Macros: troca de filamento estilo Marlin (M600), posicionamento do bico e pré-aquecimento
-- status: M600 VALIDADO em 2026-10-18; falta só conferir dois detalhes (abaixo)
+- status: M600 VALIDADO em 2026-10-18; v2 (correção da gotinha) INSTALADA em 2026-10-19 e conferida (arquivo idêntico, ret_espera 2, ret_slicer 0.8); falta ver a v2 numa troca real e testar `PREAQUECE_BICO` com bico quente
 
 ## Teste real, 2026-10-18 (job da placa do R, `teste-placa-20x20-letra-R_PLA_3m37s.gcode`)
 - `M600` inserido no Orca como custom G-code na camada 6: no G-code, logo depois de `SET_PRINT_STATS_INFO CURRENT_LAYER=6` e antes da subida para a camada
@@ -13,7 +13,7 @@
 - gotinha na retomada: CONFIRMADA pelo usuário em 2026-10-19 (Stray Kids, troca da camada 16). Causas:
   1. sobra de 0.8 mm: o Orca retrai 0.8 mm antes do `M600` e devolve 0.8 mm (`G1 E.8`) logo depois da retomada, mas a purga já deixou o bico cheio; o `RESUME` devolve só o 1 mm do `CARREGA_TROCA`. Sobram ~0.8 mm (~1.9 mm³) no primeiro ponto. Conferido nos dois `M600` do G-code do Stray Kids (retração total 0.8 antes, `G1 E.8` depois).
   2. escorrimento: só 1 mm de retração enquanto o bico quente espera a limpeza e o clique.
-- correção pronta em `to-do/macros-v2-PARA-INSTALAR.cfg` (v2, só ASCII, diferença mínima para o snapshot): `ret_espera` 2 mm depois da purga (o mesmo do `PAUSE_PARK_RETRACT_LENGTH` padrão do Marlin; 3 mm foi descartado por cautela com plástico derretido subindo para a zona fria durante a espera); no `RETOMA_TROCA`, já no ponto, devolve `ret_espera − 1 − ret_slicer` (0.2 mm) antes do `RESUME`. Com o `RESUME` (+1) e o `G1 E.8` do G-code, a conta fecha em zero. Instalar sem impressão rodando: upload por cima do `macros.cfg` e Salvar e reiniciar; depois atualizar o snapshot e apagar `to-do/macros-v2-PARA-INSTALAR.cfg`. Atenção: `printers/frank-pro/klipper/macros.cfg` é o snapshot do que já está na impressora (v1); colar ele não muda nada (aconteceu em 2026-10-19 00:54).
+- correção (v2) instalada em 2026-10-19; antes ficava em `to-do/macros-v2-PARA-INSTALAR.cfg` (v2, só ASCII, diferença mínima para o snapshot): `ret_espera` 2 mm depois da purga (o mesmo do `PAUSE_PARK_RETRACT_LENGTH` padrão do Marlin; 3 mm foi descartado por cautela com plástico derretido subindo para a zona fria durante a espera); no `RETOMA_TROCA`, já no ponto, devolve `ret_espera − 1 − ret_slicer` (0.2 mm) antes do `RESUME`. Com o `RESUME` (+1) e o `G1 E.8` do G-code, a conta fecha em zero. Instalar sem impressão rodando: upload por cima do `macros.cfg` e Salvar e reiniciar; depois atualizar o snapshot e apagar `to-do/macros-v2-PARA-INSTALAR.cfg`. Atenção: `printers/frank-pro/klipper/macros.cfg` é o snapshot do que já está na impressora (v1); colar ele não muda nada (aconteceu em 2026-10-19 00:54).
 - contorno manual enquanto a v2 não entra: depois de limpar o bico e antes de clicar Retomar, `M83` e `G1 E-0.8 F2100` no console (tira a sobra de 0.8 mm).
 - testar `PREAQUECE_BICO` com o bico já quente (o alvo deve continuar no valor atual)
 

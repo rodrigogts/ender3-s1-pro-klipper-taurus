@@ -19,7 +19,7 @@ Regras:
 | [abs-calibracao.md](abs-calibracao.md) | Frank Pro | pendente | baixa | Criar o ABS Speed e calibrar temperatura, vazão e PA do ABS |
 | [speed-como-padrao.md](speed-como-padrao.md) | Frank Pro | decisão pendente | baixa | Tornar o Speed o perfil padrão: por material, conforme for validado, ou renomear tudo no fim |
 | [trilhos-lineares.md](trilhos-lineares.md) | Frank Pro | decisão tomada: não agora | baixa | Trilhos lineares XYZ: sem ganho comprovado na S1 Pro; reabrir só com evidência de folga ou ringing |
-| [macros-klipper.md](macros-klipper.md) | Frank Pro | M600 validado, detalhes pendentes | baixa | `macros.cfg`: `M600` estilo Marlin VALIDADO em 2026-10-18 (troca bonita, janelas do Mainsail guiando). Falta conferir bolinha na retomada e `PREAQUECE_BICO` com bico quente |
+| [macros-klipper.md](macros-klipper.md) | Frank Pro | v2 instalada, falta ver numa troca | baixa | `macros.cfg`: `M600` estilo Marlin validado; v2 (sem gotinha na retomada) instalada em 2026-10-19. Falta ver a v2 numa troca real e testar `PREAQUECE_BICO` com bico quente |
 | [stray-kids-logo.md](stray-kids-logo.md) | Frank Pro | impressão pendente | baixa | Logo em 3 cores montado no Tinkercad; procedimento de troca de cor com PAUSE |
 | [orca-bundle-export.md](orca-bundle-export.md) | Frank Pro | pendente | baixa | Reexportar o `.orca_printer` (o atual é de 2026-10-05, sem os Speed) |
 | [cli-fatiamento-helper.md](cli-fatiamento-helper.md) | Frank Pro | ideia | baixa | Script para fatiar pelo CLI do Orca (torres, comparações) com as correções já conhecidas |
