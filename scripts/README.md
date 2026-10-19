@@ -30,9 +30,28 @@ O endereço é sempre passado em `--host`. Aceita IP, `IP:porta` (ex.: `:7125`, 
 | `sensores` | Sensor de filamento, probe, endstops (última consulta), eixos referenciados e idle |
 | `config` | Seções do `printer.cfg` parseadas pelo Klipper. Com `--section printer`, mostra uma seção |
 | `avisos` | Depreciações e avisos do Klipper e do Moonraker |
+| `cfg` | Conteúdo cru de um `.cfg` do Klipper (`--file printer.cfg`), sem cor, para redirecionar a um snapshot. Sem `--file`, lista os `.cfg`. Recusa `.conf` (o `moonraker.conf` pode ter credenciais) |
 
 A camada vem do Klipper quando o G-code chama `SET_PRINT_STATS_INFO`, como faz o preset `Frank Pro 0.4 nozzle Speed`. Em G-codes sem essa chamada, a camada é estimada pela altura Z e aparece com `~` (o z-hop pode adiantar uma ou duas camadas). Quando a impressão passa da estimativa do slicer, o restante aparece como `+tempo além do slicer`.
 
-A diferença entre o Klipper do host (v0.13) e o da MCU (v0.11 com GCC 10.3.1) é intencional. Quando a MCU está na build validada, `versoes` mostra a divergência como esperada e `avisos` lista o `deprecated_mcu_code` à parte, como aviso esperado. Uma MCU diferente da validada, o Klipper fora do `ready` ou qualquer outro aviso continuam aparecendo como problema. Veja [docs/frank-pro-klipper-host-mcu.md](../docs/frank-pro-klipper-host-mcu.md).
+A diferença entre o Klipper do host (v0.13) e o da MCU (v0.11 com GCC 10.3.1) é intencional. Quando a MCU está na build validada, `versoes` mostra a divergência como esperada e `avisos` lista o `deprecated_mcu_code` à parte, como aviso esperado. Uma MCU diferente da validada, o Klipper fora do `ready` ou qualquer outro aviso continuam aparecendo como problema. Veja [printers/frank-pro/README.md](../printers/frank-pro/README.md#firmware).
 
 Opções gerais: `--json` (saída para processamento), `--watch <s>` (repete a consulta) e `--help`. As cores são desativadas com `NO_COLOR` ou quando a saída não é um terminal.
+
+## `web-files.mjs` — arquivos do projeto web
+
+Monta `web-ui-project/web-files/` a partir das fontes do repo. Requer Node 18 ou superior e não tem dependências. Não acessa a rede.
+
+```sh
+node scripts/web-files.mjs           # gera e lista o que reenviar ao projeto web
+node scripts/web-files.mjs --check   # só confere; sai com 1 se algo mudaria ou um limite estoura
+```
+
+- Copia os presets de `printers/frank-pro/orca/` sem alterar nada.
+- Gera as bases que esses presets citam em `inherits`, unificando a cadeia de `resources/orca-defaults/`. A regra está no [README da pasta](../resources/orca-defaults/README.md).
+- Copia os docs e os snapshots do Klipper com nome plano. A lista fica na constante `DOCS`.
+- Valida os limites do projeto web: no máximo 25 arquivos e `instructions.md` com no máximo 8000 caracteres.
+- Mostra o que reenviar e o que remover do projeto web, comparando o conteúdo por hash.
+- Avisa, sem falhar, quando a cópia dos presets no repo difere dos presets vivos em `~/.config/OrcaSlicer/user/default/`.
+
+As regras do projeto web estão em [web-ui-project/README.md](../web-ui-project/README.md).

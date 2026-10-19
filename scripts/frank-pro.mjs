@@ -16,6 +16,7 @@ const PARAMS = {
   mesh: 'Perfis de bed mesh e grade',
   sensores: 'Filamento, probe, endstops e idle',
   config: 'Seção do printer.cfg parseada pelo Klipper (--section)',
+  cfg: 'Conteúdo cru de um .cfg do Klipper (--file); sem --file, lista os .cfg',
   avisos: 'Avisos e depreciações do Klipper/Moonraker',
 };
 
@@ -30,7 +31,7 @@ Opções:
   --json            Saída em JSON
   --watch <s>       Repete a consulta a cada <s> segundos
   --limit <n>       Quantidade de itens (historico, arquivos)
-  --file <nome>     Arquivo G-code (arquivo, historico)
+  --file <nome>     Arquivo G-code (arquivo, historico) ou .cfg (cfg)
   --section <nome>  Seção do printer.cfg (config)
   --help            Mostra esta ajuda
 
@@ -59,7 +60,7 @@ if (!args.host) { console.error(USAGE); process.exit(2); }
 if (!PARAMS[args.param]) { console.error(`--param desconhecido: ${args.param}\n\n${USAGE}`); process.exit(2); }
 
 // Build da MCU validada na Frank Pro. A divergência com o host é intencional:
-// ver docs/frank-pro-klipper-host-mcu.md antes de alterar.
+// ver printers/frank-pro/README.md antes de alterar.
 const MCU_VALIDADA = { version: 'v0.11.0-0-ge02b725', toolchain: 'GNU Arm Embedded Toolchain 10.3-2021.10' };
 const mcuValidada = (version, build) => version === MCU_VALIDADA.version && String(build ?? '').includes(MCU_VALIDADA.toolchain);
 
@@ -111,6 +112,17 @@ async function get(path) {
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(`HTTP ${res.status} em /${path}: ${body?.error?.message ?? res.statusText}`);
   return body.result;
+}
+// Arquivos servidos pelo Moonraker vêm crus, não em JSON
+async function getText(path) {
+  let res;
+  try {
+    res = await fetch(`${BASE}/${path}`, { signal: AbortSignal.timeout(5000) });
+  } catch (e) {
+    throw new Error(`sem resposta de ${BASE} (${e.cause?.code ?? e.name}: ${e.cause?.message ?? e.message})`);
+  }
+  if (!res.ok) throw new Error(`HTTP ${res.status} em /${path}: ${res.statusText}`);
+  return res.text();
 }
 const query = async (objs) => {
   const qs = Object.entries(objs).map(([k, v]) => encodeURIComponent(k) + (v ? `=${v}` : '')).join('&');
@@ -365,6 +377,19 @@ Q.config.print = (d) => {
   return `${c.bold(`[${d.secao}]`)}\n${Object.entries(d.valores).map(([k, v]) => `${k}: ${fmt(v)}`).join('\n')}`;
 };
 
+// Só .cfg do Klipper: moonraker.conf e outros .conf podem ter credenciais
+const CFG_OK = /^[\w.-]+\.cfg$/;
+Q.cfg = async () => {
+  if (!args.file) {
+    const list = await get('server/files/list?root=config');
+    return { arquivos: list.map((f) => f.path).filter((f) => CFG_OK.test(f)).sort() };
+  }
+  if (!CFG_OK.test(args.file)) throw new Error(`--file aceita só .cfg da raiz do config (recebido: ${args.file})`);
+  return { arquivo: args.file, conteudo: await getText(`server/files/config/${encodeURIComponent(args.file)}`) };
+};
+// Sem cor nem moldura: a saída serve para redirecionar a um snapshot
+Q.cfg.print = (d) => (d.arquivos ? d.arquivos.join('\n') : d.conteudo.replace(/\n$/, ''));
+
 Q.avisos = async () => {
   const [s, si] = await Promise.all([
     query({ configfile: 'warnings', webhooks: '', mcu: 'mcu_version,mcu_build_versions' }), get('server/info')]);
@@ -385,7 +410,7 @@ Q.avisos.print = (d) => {
   if (!L.length) L.push(c.green('Nenhum aviso real.'));
   const esperados = d.klipper.filter((w) => w.esperado);
   if (esperados.length) {
-    L.push('', c.dim(`Esperados (MCU na build validada ${MCU_VALIDADA.version}; ver docs/frank-pro-klipper-host-mcu.md):`));
+    L.push('', c.dim(`Esperados (MCU na build validada ${MCU_VALIDADA.version}; ver printers/frank-pro/README.md):`));
     for (const w of esperados) L.push(c.dim(`  [${w.type}] ${w.message}`));
   }
   return L.join('\n');
