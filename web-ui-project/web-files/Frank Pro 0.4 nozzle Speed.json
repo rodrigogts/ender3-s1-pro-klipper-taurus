@@ -1,5 +1,5 @@
 {
-	"change_filament_gcode": "PAUSE",
+	"change_filament_gcode": "M600",
 	"from": "User",
 	"gcode_flavor": "klipper",
 	"inherits": "Creality Ender-3 S1 Pro 0.4 nozzle",
