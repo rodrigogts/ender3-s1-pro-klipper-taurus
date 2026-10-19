@@ -4,7 +4,7 @@ Como achar o valor efetivo de qualquer configuração nos arquivos JSON deste pr
 
 ## Conjunto
 Uma impressão usa 3 presets selecionados juntos no Orca: impressora (machine) + filamento + processo.
-Conjunto de velocidade atual: `Frank Pro 0.4 nozzle Speed` + `0.20mm Standard @Taurus <material> Speed` + `Creality Taurus <material> Speed`.
+Conjunto Speed: `Frank Pro 0.4 nozzle Speed` + `0.20mm Standard @Taurus Speed` (o mesmo para todos os materiais) + `Creality Taurus <material> Speed`. Material novo = só um filamento Speed novo.
 
 ## Mapa preset → base
 Cada preset personalizado tem só os campos alterados e aponta a base pelo campo `inherits` (pelo `name` da base, que é igual ao nome do arquivo sem `.json`).
@@ -14,8 +14,7 @@ Cada preset personalizado tem só os campos alterados e aponta a base pelo campo
 | Frank Pro 0.4 nozzle.json | machine | Creality Ender-3 S1 Pro 0.4 nozzle.json | original |
 | Frank Pro 0.4 nozzle Speed.json | machine | Creality Ender-3 S1 Pro 0.4 nozzle.json | em uso |
 | 0.20mm Standard @Taurus.json | process | 0.20mm Standard @Creality Ender3S1Pro.json | original |
-| 0.20mm Standard @Taurus PETG XT Speed.json | process | 0.20mm Standard @Creality Ender3S1Pro.json | em uso |
-| 0.20mm Standard @Taurus PLA Speed.json | process | 0.20mm Standard @Creality Ender3S1Pro.json | em uso |
+| 0.20mm Standard @Taurus Speed.json | process | 0.20mm Standard @Creality Ender3S1Pro.json | em uso (todos os filamentos Speed) |
 | Creality Taurus PETG XT Speed.json | filament | Creality Generic PETG.json | VALIDADO |
 | Creality Taurus PLA Speed.json | filament | Creality Generic PLA.json | parcial |
 | Creality Taurus PETG XT.json | filament | Creality Generic PETG.json | baseline |

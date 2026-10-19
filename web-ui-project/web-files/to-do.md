@@ -10,6 +10,7 @@ Regras:
 
 | Arquivo | Máquina | Status | Prioridade | Resumo |
 |---|---|---|---|---|
+| [exclude-object.md](exclude-object.md) | Frank Pro | em andamento | alta | Ligar `[exclude_object]` no Klipper e no processo Speed do Orca para cancelar só a peça que falhou. Klipper primeiro, Orca depois |
 | [mesa-termistor.md](mesa-termistor.md) | Frank Pro | aberto | alta | Termistor da mesa com leitura errática entre 95 e 97 °C que desarmou o verify_heater duas vezes. Suspeita no lado quente; medir ~100 kΩ mexendo o cabo |
 | [pi-fonte.md](pi-fonte.md) | Frank Pro | comprada, teste pendente | alta | Fonte nova do Pi: confirmar que somem o "Previously Under-Volted" e a queda do USB da MCU |
 | [pla-speed-validacao.md](pla-speed-validacao.md) | Frank Pro | pausado | média | Calombos no overhang do casco do Benchy em PLA Speed (Z 5–10). O casco oco reproduz em ~12 min; o teste com PA 0.025 está pronto (G-code editado) e não foi impresso. Peças sem overhang daquele tipo imprimem bem |
@@ -26,14 +27,14 @@ Regras:
 | [armazenamento-filamento.md](armazenamento-filamento.md) | geral | sacos a caminho; sílica em teste | baixa | 20 sacos a vácuo PA+PE 32 × 34 cm (chegam até 24/10; os atuais perdem vácuo) e sílica laranja regenerável (testando 65 °C no secador; o usual é ~100–120 °C) |
 | [cli-fatiamento-helper.md](cli-fatiamento-helper.md) | Frank Pro | ideia | baixa | Script para fatiar pelo CLI do Orca (torres, comparações) com as correções já conhecidas |
 
-Ordem sugerida na Frank Pro: mesa-termistor e pi-fonte (confiabilidade) → pla-speed-validacao → petg-max-flowrate → bico-cht → input-shaper-adxl. O bico CHT, quando chegar, vem antes do max flowrate, porque o limite muda com ele.
+Ordem sugerida na Frank Pro: exclude-object (pedido do usuário; rápido) → mesa-termistor e pi-fonte (confiabilidade) → pla-speed-validacao → petg-max-flowrate → bico-cht → input-shaper-adxl. O bico CHT, quando chegar, vem antes do max flowrate, porque o limite muda com ele.
 
 <!-- fonte: to-do/abs-calibracao.md -->
 # Calibrar ABS (temperatura, vazão e PA) e criar o ABS Speed
 - status: pendente, sem data
 - máquina: Frank Pro
 - prioridade: baixa
-- atualizado: 2026-10-18
+- atualizado: 2026-10-19
 
 ## Fatos
 - existe só o baseline `Creality Taurus ABS`: 245 °C (250 na primeira camada), faixa até 250, fan 20%, overhang 35%, herda de `Creality Generic ABS` (mesa 100 °C, max volumetric 12)
@@ -41,15 +42,22 @@ Ordem sugerida na Frank Pro: mesa-termistor e pi-fonte (confiabilidade) → pla-
 - marca e etiqueta do ABS em uso: não informadas
 - a mesa tem limite de 110 °C (`max_temp`)
 - regra do projeto: não ativar PA no ABS antes da torre no próprio ABS
+- 2026-10-19: clips de saco de 12 cm em ABS (job 000069, 84 g, 6h38m pelo slicer) fatiados com `Frank Pro 0.4 nozzle` + `0.20mm Standard @Taurus Speed` + `Creality Taurus PETG XT Speed` sem alteração: bico 270 °C, mesa 105 °C, fan 10–15%, overhang 25%, PA 0,125 (do PETG XT), sem brim. Parcial, camada ~4/50 às 13:22: pontas sem empenar e impressão boa (relato do usuário, sem gabinete informado). Às 13:29, camada ~4/50 (12,5%), o usuário baixou o bico para 245 °C pelo Mainsail; o G-code não redefine a temperatura depois do start. Resultado: cancelado às 2h39m de impressão; dos 6 clips, o do meio empenou (relato do usuário).
+- 2026-10-19 15:07 (job 00006A): 1 clip, `Frank Pro 0.4 nozzle` + `0.20mm Standard @Taurus` + `Creality Taurus ABS`: bico 250/245 °C, mesa 105 °C, PA desligado, fan 20%, aceleração 500 mm/s², sem brim. Resultado: pendente.
+- 245 °C: o usuário já usou neste ABS e funcionou (sem vazão no ar nem torre).
+- Este clip saiu bem 6 vezes no baseline `Creality Taurus ABS`, sem brim (relato do usuário). Brim dispensado para ele.
+- 270 °C: as camadas 1–4 do job 000069 saíram sem defeito visível (relato do usuário), a 500 mm/s² e vazão baixa.
 
 ## Hipóteses
 - O ABS pede cooling baixo e é sensível a corrente de ar. Gabinete: não informado se existe.
 - Pela tendência PLA 0.038 × PETG 0.125, o PA do ABS deve ficar em torno do do PLA, mas isso não é base para pular a torre.
+- Referência (padrão de fábrica, não medição): nos perfis de sistema Creality do Orca, o PA do ABS fica abaixo do PETG em 8 de 9 máquinas (0,5–0,86× o do PETG; ex.: K1C ABS 0,06 × PETG 0,08; Ender-3 V4 0,026 × 0,05) e perto do PLA (0,04).
+- O usuário aposta que o PA do ABS a 270 °C fica perto do PETG XT (0,125).
 
 ## Próximos passos
 1. Anotar a faixa de temperatura da etiqueta do ABS.
-2. Criar `Creality Taurus ABS Speed` como cópia do baseline e um processo `0.20mm Standard @Taurus ABS Speed`, com PA desligado e `SET_PRESSURE_ADVANCE ADVANCE=0` no end gcode, igual aos outros Speed.
-3. Fazer a vazão no ar (procedimento em `printers/frank-pro/calibracao.md`) e escolher a temperatura.
+2. Criar `Creality Taurus ABS Speed` como cópia do baseline (o processo é o `0.20mm Standard @Taurus Speed`, comum a todos), com PA desligado e `SET_PRESSURE_ADVANCE ADVANCE=0` no end gcode, igual aos outros Speed.
+3. Vazão no ar (procedimento em `printers/frank-pro/calibracao.md`) em F250 (10 mm³/s) e F300 (12 mm³/s), começando no máximo da etiqueta −5 °C. Perda ≤ ~2% nos dois → fica nessa temperatura. Senão, testar no máximo da etiqueta. Base: PETG XT terminou no máximo (270 de 270; 265 perdeu 4,3%) e PLA a 5 °C do máximo (225 de 230, único ponto testado, com folga de 0,2–0,6%).
 4. Fazer a torre de PA com o filamento ABS Speed.
 5. Imprimir um Benchy e conferir empeno e delaminação.
 
@@ -131,6 +139,38 @@ Ordem sugerida na Frank Pro: mesa-termistor e pi-fonte (confiabilidade) → pla-
 
 ## Fecha quando
 - Script feito e validado contra um G-code do GUI, ou descartado.
+
+<!-- fonte: to-do/exclude-object.md -->
+# Exclude object: cancelar só a peça que falhou
+- status: em andamento (Orca feito; falta o Klipper)
+- máquina: Frank Pro
+- prioridade: alta (pedido do usuário)
+- atualizado: 2026-10-19
+
+## Fatos
+- 2026-10-19: job 000069 (6 clips em ABS) cancelado com 2h39m de impressão porque o clip do meio empenou. Com exclude object, os outros 5 seguiriam.
+- `printer.cfg` não tem `[exclude_object]`.
+- No Orca, `exclude_object` é opção do preset de processo (Others → Exclude objects), não da impressora. `gcode_label_objects` já vem 1.
+- 2026-10-19: `"exclude_object": "1"` gravado no `0.20mm Standard @Taurus Speed` (Orca e repo). O Orca só aplica depois de reiniciar.
+- `[exclude_object]` é módulo só do host (Klipper v0.13); a versão da MCU não importa.
+- Só o processo `0.20mm Standard @Taurus Speed` pode receber a opção; o `0.20mm Standard @Taurus` original não se edita.
+
+## Próximos passos
+1. Usuário, pelo Mainsail, com a impressora parada: acrescentar ao `printer.cfg`, fora do bloco do SAVE_CONFIG, e dar `RESTART`:
+   ```ini
+   [exclude_object]
+   ```
+2. Agente: atualizar o snapshot (`node scripts/frank-pro.mjs --host 192.168.0.150 --param cfg --file printer.cfg > printers/frank-pro/klipper/printer.cfg`) e conferir a seção.
+3. Usuário reinicia o Orca (feche sem salvar o processo, senão o GUI sobrescreve).
+4. Fatiar 2 peças e conferir no G-code `EXCLUDE_OBJECT_DEFINE` no cabeçalho e `EXCLUDE_OBJECT_START`/`END` em volta de cada peça.
+5. Testar numa impressão de 2 peças pequenas: excluir uma pelo Mainsail (painel de status → Exclude objects) ou no console com `EXCLUDE_OBJECT NAME=<nome>`; a outra deve terminar normal.
+
+## Riscos
+- G-code com `EXCLUDE_OBJECT_DEFINE` numa impressora sem `[exclude_object]` para com comando desconhecido: não mandar G-code do processo Speed antes do passo 1.
+- `RESTART` derruba a impressão em andamento.
+
+## Fecha quando
+- Uma peça excluída no meio da impressão e as outras terminando sem defeito. Resultado vai para `printers/frank-pro/README.md` e uma linha sobre o uso em `resources/utils/klipper.md`.
 
 <!-- fonte: to-do/frank-mini-diagnostico.md -->
 # Frank Mini: diagnóstico da mesa que aquece sozinha e do encoder
@@ -273,13 +313,15 @@ Instalado na impressora; o snapshot fica em `printers/frank-pro/klipper/macros.c
 - status: aberto; contornado, porque a mesa a 105 °C fica estável
 - máquina: Frank Pro
 - prioridade: alta (segurança térmica)
-- atualizado: 2026-10-18
+- atualizado: 2026-10-19
 
 ## Fatos
 - 2026-10-17: duas impressões abortadas no aquecimento com `Heater heater_bed not heating at expected rate`
 - leitura entre 95 e 97 °C com potência 100%: quedas de ~7 °C em 7 s e saltos de +3.8 a +6.2 °C em 1 s. Fisicamente impossível, então é falha de medição. Saltos menores já apareciam em sessões anteriores.
 - o borne parafusado foi aberto: sem solda solta, tudo normal. Num aquecimento só da mesa depois disso, os saltos voltaram entre 95 e 97 °C, mas passou e ficou estável a 105 °C.
 - impressão de 3h26m a 105 °C: estável (±0.02 °C), zero saltos acima de 1.5 °C/s
+- 2026-10-19 (job 000069): aquecimento de 45 a 105 °C em ~4 min, amostrado a cada ~2 s, sem salto nem queda; 95→97 °C a ~0,2 °C/s, com potência de 100%. Defeito intermitente: um aquecimento limpo não fecha o item.
+- 2026-10-19 ~16h: `MCU shutdown: ADC out of range` com alvo de 110 °C (= `max_temp`). Subida lisa até 110,0 °C (~0,2 °C/s, sem salto); é o limite de configuração, não este defeito.
 - sensor: EPCOS 100K B57560G104F, no pino PC4
 
 ## Hipóteses
