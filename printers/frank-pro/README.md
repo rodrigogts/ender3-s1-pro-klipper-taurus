@@ -41,14 +41,14 @@ Legenda: VALIDADO = medido ou testado na máquina; PENDENTE = ainda não feito; 
   - `M600` estilo Marlin + `CARREGA_TROCA` e `RETOMA_TROCA`: estaciona em X0 Y220, descarrega, janela de confirmação no Mainsail, purga em X0 Y0, volta com XY no alto e desce na vertical; idle_timeout 1800 s durante a troca. VALIDADO em 2026-10-18 (placa do R, PLA → PLA): pausa de ~2 min, mensagens do Mainsail guiando cada passo, idle_timeout de volta a 600 s no fim.
   - `CENTRO` e `CANTO N=1..4`: bico no centro ou sobre os parafusos da mesa, 5 mm acima.
   - `PREAQUECE_BICO S=170`: usado no start G-code da impressora Speed no lugar de `M104 S170`; só pré-aquece se o alvo do bico estiver abaixo de 170. O start G-code do preset Speed depende deste arquivo.
-- os presets ainda usam `PAUSE` na troca de filamento e na pausa do Orca; o `M600` entra por G-code custom ou `SET_PAUSE_AT_LAYER LAYER=<n> MACRO=M600`
+- impressora Speed: Change filament G-code = `M600` desde 2026-10-19 (o "Add color change" do Orca gera `M600`; peça de uma cor não ganha `M600`, conferido no fatiamento); Pause G-code continua `PAUSE`. Impressora normal: `PAUSE` nos dois. Também dá para usar G-code custom `M600` ou `SET_PAUSE_AT_LAYER LAYER=<n> MACRO=M600`
 - firmware retraction: não configurado
 - Input Shaper: não configurado (PENDENTE, medir com ADXL na própria máquina)
 - quem altera o Klipper: o usuário, manualmente, pelo Mainsail. Os snapshots em `klipper/` são só leitura.
 
 ## Orca — presets (`orca/`)
 - impressora `Frank Pro 0.4 nozzle`: perfil original; limites de máquina herdados da S1 Pro
-- impressora `Frank Pro 0.4 nozzle Speed`: limites 2000 mm/s² e 300 mm/s alinhados ao printer.cfg; `SET_PRINT_STATS_INFO` (camada atual e total); PAUSE na troca de filamento; aquecimento com `PREAQUECE_BICO S=170` e `TEMPERATURE_WAIT` (mesa MIN alvo / MAX alvo+3; bico MIN alvo / MAX alvo+8) no lugar de `M190`/`M109` desde 2026-10-19
+- impressora `Frank Pro 0.4 nozzle Speed`: limites 2000 mm/s² e 300 mm/s alinhados ao printer.cfg; `SET_PRINT_STATS_INFO` (camada atual e total); `M600` na troca de filamento e `PAUSE` na pausa; aquecimento com `PREAQUECE_BICO S=170` e `TEMPERATURE_WAIT` (mesa MIN alvo / MAX alvo+3; bico MIN alvo / MAX alvo+8) no lugar de `M190`/`M109` desde 2026-10-19
 - processo `0.20mm Standard @Taurus`: perfil original
 - processos `… PETG XT Speed` e `… PLA Speed` (iguais por enquanto): acelerações por tipo (parede externa e topo 1000, internas e sólido 1600, sparse 1800, travel 2000, primeira camada 650/900); paredes internas e infill a 90 mm/s, parede externa 60, topo 40
 - filamento `Creality Taurus PETG XT Speed`: VALIDADO (PETG XT/Tritan HT 3D Fila, 270 °C, PA 0.125)

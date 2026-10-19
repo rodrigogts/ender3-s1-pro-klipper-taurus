@@ -41,7 +41,7 @@ Se um arquivo contradizer o usuário, valer o usuário e apontar a divergência.
 - PA mora no preset de filamento, por material, com `SET_PRESSURE_ADVANCE ADVANCE=0` no end gcode; printer.cfg fica com PA 0. Cancelar impressão não roda o end gcode: lembrar `RESTART`.
 - Não ativar PA, Input Shaper ou limites agressivos num material antes da calibração correspondente nele. Input Shaper só medido na própria Frank Pro (ADXL).
 - Orca: G-code flavor Klipper; z-offset do slicer 0; start G-code carrega `BED_MESH_PROFILE LOAD=default`; nunca `M420 S1`.
-- Troca de filamento/pausa: os presets usam `PAUSE`. `M600` estilo Marlin (`macros.cfg`) testado e funcionando desde 2026-10-18: custom G-code na camada da cor nova. Start G-code Speed usa `PREAQUECE_BICO` (macro própria).
+- Troca de filamento: `M600` estilo Marlin (`macros.cfg`), testado desde 2026-10-18. Impressora Speed: o "Add color change" do Orca gera `M600`. Pausa: `PAUSE`. Start G-code Speed usa `PREAQUECE_BICO` (macro própria).
 - Não ativar firmware retraction: não há `[firmware_retraction]`.
 - Nunca alterar presets de sistema/bases do Orca; mudanças em presets personalizados (overrides), de preferência os Speed.
 - Perfis baseline não calibrados não servem de referência para outro material; não extrapolar.

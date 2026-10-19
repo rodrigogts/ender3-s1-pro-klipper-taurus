@@ -67,7 +67,7 @@ Ferramenta padrão de consulta e diagnóstico: `scripts/frank-pro.mjs` (Node 18+
 - Z-offset do slicer: 0.
 - Start G-code: `BED_MESH_PROFILE LOAD=default`.
 - Não usar `M420 S1`.
-- `PAUSE` substitui usos antigos de `M25` e é o que os presets usam na pausa e na troca de filamento.
+- `PAUSE` substitui usos antigos de `M25` e é o Pause G-code dos presets. Troca de filamento: a impressora Speed usa `M600` no Change filament G-code desde 2026-10-19 (o "Add color change" do Orca já gera `M600`); a Frank Pro normal continua com `PAUSE`.
 - `M600` (`macros.cfg`, estilo Marlin) testado e funcionando desde 2026-10-18: na troca de cor por camada, o usuário põe `M600` como custom G-code no Orca na primeira camada da cor nova. Detalhes em `resources/utils/klipper.md` e `to-do/macros-klipper.md`.
 - O start G-code da impressora Speed usa `PREAQUECE_BICO S=170` (macro do `macros.cfg`): sem esse arquivo na impressora, a impressão para com comando desconhecido.
 - O start G-code da Speed espera temperatura com `TEMPERATURE_WAIT` (MIN = alvo; MAX = alvo +3 na mesa, +8 no bico), não com `M190`/`M109`: no Klipper eles esperam estabilizar e o pico do PID custava ~1,5 min por impressão (medido em 2026-10-18). Manter `M140`/`M104` no start, senão o Orca insere `M190`/`M109` sozinho.

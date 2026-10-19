@@ -105,7 +105,7 @@ G1 Z0.1 F300                 ; teste do papel (Z0 = bico encostando, pelo z_offs
 - Atalhos (`macros.cfg`): `CENTRO` e `CANTO N=1..4` sobem a 5 mm e levam o bico ao centro ou ao parafuso N.
 
 ## Troca de filamento (cor por camada, Klipper)
-Com o `macros.cfg` (instalado e testado em 2026-10-18), a troca é o `M600` estilo Marlin: `SET_PAUSE_AT_LAYER LAYER=<n> MACRO=M600` no console, ou `M600` no G-code depois de `SET_PRINT_STATS_INFO CURRENT_LAYER=<n>`. Daí em diante, seguir a janela do Mainsail (Carregar e purgar → Retomar). Detalhes em `to-do/macros-klipper.md`.
+Com a impressora Speed, o "Add color change" da barra de camadas do Orca já gera `M600` (Change filament G-code = `M600` desde 2026-10-19). Com o `macros.cfg` (instalado e testado em 2026-10-18), a troca é o `M600` estilo Marlin: `SET_PAUSE_AT_LAYER LAYER=<n> MACRO=M600` no console, ou `M600` no G-code depois de `SET_PRINT_STATS_INFO CURRENT_LAYER=<n>`. Daí em diante, seguir a janela do Mainsail (Carregar e purgar → Retomar). Detalhes em `to-do/macros-klipper.md`.
 
 Troca manual, sem o `M600` (alternativa):
 
