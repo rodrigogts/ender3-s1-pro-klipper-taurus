@@ -1,5 +1,5 @@
 # Macros: troca de filamento estilo Marlin (M600), posicionamento do bico e pré-aquecimento
-- status: M600 VALIDADO em 2026-10-18; v2 (correção da gotinha) INSTALADA em 2026-10-19 e conferida (arquivo idêntico, ret_espera 2, ret_slicer 0.8); falta ver a v2 numa troca real e testar `PREAQUECE_BICO` com bico quente
+- status: M600 e v2 VALIDADOS (v2 em 2026-10-19: retomada sem gotinha, sem console); falta só testar `PREAQUECE_BICO` com bico quente
 
 ## Teste real, 2026-10-18 (job da placa do R, `teste-placa-20x20-letra-R_PLA_3m37s.gcode`)
 - `M600` inserido no Orca como custom G-code na camada 6: no G-code, logo depois de `SET_PRINT_STATS_INFO CURRENT_LAYER=6` e antes da subida para a camada
