@@ -43,15 +43,16 @@ Opções gerais: `--json` (saída para processamento), `--watch <s>` (repete a c
 Monta `web-ui-project/web-files/` a partir das fontes do repo. Requer Node 18 ou superior e não tem dependências. Não acessa a rede.
 
 ```sh
-node scripts/web-files.mjs           # gera e lista o que reenviar ao projeto web
-node scripts/web-files.mjs --check   # só confere; sai com 1 se algo mudaria ou um limite estoura
+node scripts/web-files.mjs            # gera e lista o que mudou desde o último envio ao projeto web
+node scripts/web-files.mjs --enviado  # depois de subir: registra o que está no projeto web
+node scripts/web-files.mjs --check    # só confere; sai com 1 se algo mudaria ou um limite estoura
 ```
 
 - Copia os presets de `printers/frank-pro/orca/` sem alterar nada.
 - Gera as bases que esses presets citam em `inherits`, unificando a cadeia de `resources/orca-defaults/`. A regra está no [README da pasta](../resources/orca-defaults/README.md).
 - Copia os docs e os snapshots do Klipper com nome plano. A lista fica na constante `DOCS`.
 - Valida os limites do projeto web: no máximo 25 arquivos e `instructions.md` com no máximo 8000 caracteres.
-- Mostra o que reenviar e o que remover do projeto web, comparando o conteúdo por hash.
+- Compara por hash com o último envio registrado em `web-ui-project/web-enviado.json` e lista o que subir de novo, o que remover do projeto web e se o `instructions.md` mudou. A lista vale desde o último `--enviado`, mesmo que várias gerações tenham passado no meio.
 - Avisa, sem falhar, quando a cópia dos presets no repo difere dos presets vivos em `~/.config/OrcaSlicer/user/default/`.
 
 As regras do projeto web estão em [web-ui-project/README.md](../web-ui-project/README.md).

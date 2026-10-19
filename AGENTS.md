@@ -91,7 +91,7 @@ Resultados e procedimentos: `printers/frank-pro/calibracao.md`.
 ## Projeto web
 - Regras e limites: `web-ui-project/README.md` (instruções ≤ 8000 caracteres, ≤ 25 arquivos, texto escrito para LLM).
 - `web-ui-project/instructions.md` é a versão web deste arquivo: sem CLI, com o mapa dos arquivos. Ao mudar regras aqui, refletir lá.
-- Depois de mudar preset, doc de impressora, to-do, snapshot ou guia: rodar `node scripts/web-files.mjs` e informar ao usuário a lista de arquivos a reenviar ou remover.
+- Depois de mudar preset, doc de impressora, to-do, snapshot ou guia: rodar `node scripts/web-files.mjs` e informar ao usuário o que subir de novo ou remover desde o último envio. O usuário roda `--enviado` depois de atualizar o projeto web; o registro fica em `web-ui-project/web-enviado.json`.
 - Nunca editar `web-ui-project/web-files/` à mão.
 
 ## Filosofia técnica

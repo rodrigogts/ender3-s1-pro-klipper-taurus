@@ -39,10 +39,10 @@ Nunca editar `web-files/` à mão: o script apaga e recria. Editar a fonte.
 
 ## Fluxo de atualização
 1. Editar a fonte (preset, doc ou snapshot).
-2. `node scripts/web-files.mjs`
-3. Reenviar ao projeto web os arquivos que o script listar em "Reenviar"; apagar do projeto web os de "Remover do projeto web".
-4. Se `instructions.md` mudou, colar de novo no campo de instruções.
-5. `node scripts/web-files.mjs --check` deve sair com "Nada mudou".
+2. `node scripts/web-files.mjs`: gera e lista o que mudou desde o último envio registrado.
+3. No projeto web: substituir os arquivos de "Subir de novo", apagar os de "Remover do projeto web" e, se avisado, colar de novo o `instructions.md`.
+4. `node scripts/web-files.mjs --enviado`: registra o novo estado do projeto web em `web-enviado.json` (commitar junto).
+5. `node scripts/web-files.mjs --check` deve dizer "Projeto web em dia com o último envio".
 
 Atualizar o snapshot do Klipper (somente leitura, GET no Moonraker):
 ```sh

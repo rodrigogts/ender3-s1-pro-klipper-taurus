@@ -1,0 +1,30 @@
+{
+  "data": "2026-10-19 02:22",
+  "instrucoes": "48a73337802ec6e726fbdfe2f21869b92feb3be20500f59ea5b85ca6d5269bdf",
+  "arquivos": {
+    "0.20mm Standard @Creality Ender3S1Pro.json": "5112a39693685419dd17e59b840e0b6364ec115f2a549dc697de52c6c68150e9",
+    "0.20mm Standard @Taurus PETG XT Speed.json": "66285d9683512ce122783f9666469433ace682a2d22e05dd12aa8d9c2d2bd788",
+    "0.20mm Standard @Taurus PLA Speed.json": "507873b365c74f0411a2998db7fba2d55b3d6883c5eae0a3e5c50d8ca0e8b18e",
+    "0.20mm Standard @Taurus.json": "36a04c0d9265bf7a1cc30c5dc73b6fc346c45cef938e2be398ae100259e1a923",
+    "Creality Ender-3 S1 Pro 0.4 nozzle.json": "84e48cd69ca43df79bf969b6afdc894b51b017ea0b5ebeb929f48ccd67151c43",
+    "Creality Generic ABS.json": "aa597fff5620a0b89f37d3316b66e1708e44a7debad31f6b2a7f38803ff7a1ec",
+    "Creality Generic PETG.json": "0e92d90e3d2e491f199aa7625c2d6cae97df5175006930285f1e85c66ad965e0",
+    "Creality Generic PLA.json": "f83606041933671659fbadb1647d4b47228e8acd4caa660df180e2d8d5a5047e",
+    "Creality Generic TPU.json": "98b813950389b4a044eab0d4ac53d9577108bc67cf45c8495b7af6c404376a36",
+    "Creality Taurus ABS.json": "f39680e69d443871964cb2dfbc7f2d2e1127d7cbd6d030927ca7626f4724394b",
+    "Creality Taurus PETG XT Speed.json": "6e24f61d9645929cb24b9da1ac05568433ea88e0d2774a3901fcec2480ae1d03",
+    "Creality Taurus PETG XT.json": "6932301186c7821ae601b55f59d79be8f5df2894785f480eae5061c7916e8194",
+    "Creality Taurus PETG.json": "8830cdc392576f2d65fb4f06dabf42e8b5cd51981a0ea6dfd6421992a193c7c5",
+    "Creality Taurus PLA Speed.json": "c989e5fd7d9ce4514b23b52a8422b130ae414c46319bf676188494200972fd08",
+    "Creality Taurus PLA.json": "ec717704042bcced71e318c53b8d1cf8128c5fa8f064f3c62b37bf0ab0576e83",
+    "Creality Taurus TPU.json": "af754ce02e2b6cbdc8ae082ec1a23c29dcbc390aaceb8845aa9db8495e3d7967",
+    "Frank Pro 0.4 nozzle Speed.json": "281161ce984a50042f9c5ef2f7ff4e868ac711562ed8132a27143bee8a78c288",
+    "Frank Pro 0.4 nozzle.json": "7618a615a91367349899063ec18f09e212b793252eb7a4c181ab8c2aa200c969",
+    "frank-mini.md": "d697754f859d1033e9ed4e086bb6fe697fb6765c34584adf1e83e8fc891c63a2",
+    "frank-pro-calibracao.md": "33dba2308f64e9f2cd7e83bca0ddcc42a0d26954687957177ed64f49364815fc",
+    "frank-pro-klipper.cfg.txt": "1cd59d048301e41b5cf42a0ed811c12701cde8578a33f4d987169c436cdc1f43",
+    "frank-pro.md": "5eec168d20dc4985dc52db283dc42daf325d1907498a845b7369b4777a51de1a",
+    "guia-presets.md": "d7ab2d26b6c046de520fbd4fa0672d947e8936f19fd436b40e93e01ceb9e7ade",
+    "to-do.md": "2880ceca620a6ef987951778c10f75967f33663d6895c13644c43d81788e2de4"
+  }
+}

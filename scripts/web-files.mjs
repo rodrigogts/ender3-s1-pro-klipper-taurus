@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Monta web-ui-project/web-files/ para o projeto web: presets da Frank Pro, bases do Orca
-// unificadas e docs. Valida os limites do projeto web e lista o que reenviar.
-// Uso: node scripts/web-files.mjs [--check]
+// unificadas e docs. Valida os limites do projeto web e lista o que mudou desde o último envio.
+// Uso: node scripts/web-files.mjs [--check | --enviado]
 
 import { parseArgs } from 'node:util';
 import fs from 'node:fs';
@@ -10,31 +10,43 @@ import os from 'node:os';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 
-const USAGE = `Uso: node scripts/web-files.mjs [--check]
+const USAGE = `Uso: node scripts/web-files.mjs [--check | --enviado]
 
 Gera web-ui-project/web-files/ a partir das fontes do repo:
   - presets de printers/frank-pro/orca/{machine,filament,process}/, copiados sem alteração;
   - bases herdadas por esses presets, unificadas a partir de resources/orca-defaults/;
   - docs e snapshots do Klipper, com nome plano.
 
+Depois de gerar, lista o que mudou no projeto web desde o último envio registrado
+(subir de novo, remover e se o instructions.md mudou).
+
 Opções:
-  --check   Não escreve nada; sai com 1 se algo mudaria ou se um limite estoura
-  --help    Mostra esta ajuda`;
+  --check    Não escreve nada; sai com 1 se algo mudaria ou se um limite estoura
+  --enviado  Gera e registra o conteúdo atual como enviado ao projeto web
+             (rodar depois de subir os arquivos e colar as instruções)
+  --help     Mostra esta ajuda`;
 
 let args;
 try {
   ({ values: args } = parseArgs({
-    options: { check: { type: 'boolean', default: false }, help: { type: 'boolean', default: false } },
+    options: {
+      check: { type: 'boolean', default: false },
+      enviado: { type: 'boolean', default: false },
+      help: { type: 'boolean', default: false },
+    },
   }));
 } catch (e) {
   console.error(`${e.message}\n\n${USAGE}`);
   process.exit(2);
 }
 if (args.help) { console.log(USAGE); process.exit(0); }
+if (args.check && args.enviado) { console.error(`--check e --enviado não combinam\n\n${USAGE}`); process.exit(2); }
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'web-ui-project/web-files');
 const INSTRUCOES = path.join(ROOT, 'web-ui-project/instructions.md');
+// Registro do que está no projeto web (hash por arquivo), gravado com --enviado
+const ENVIADO = path.join(ROOT, 'web-ui-project/web-enviado.json');
 const DEFAULTS = path.join(ROOT, 'resources/orca-defaults');
 const PRESETS = path.join(ROOT, 'printers/frank-pro/orca');
 const ORCA_USER = path.join(os.homedir(), '.config/OrcaSlicer/user/default');
@@ -172,7 +184,7 @@ if (fs.existsSync(ORCA_USER)) {
   }
 }
 
-// ---------- diferença com o web-files atual ----------
+// ---------- diferença com o web-files atual (geração) ----------
 const atuais = new Map();
 if (fs.existsSync(OUT)) {
   for (const nome of fs.readdirSync(OUT)) {
@@ -180,8 +192,37 @@ if (fs.existsSync(OUT)) {
     if (fs.statSync(file).isFile()) atuais.set(nome, hash(fs.readFileSync(file)));
   }
 }
-const reenviar = [...saida].filter(([nome, buf]) => atuais.get(nome) !== hash(buf)).map(([nome]) => nome).sort();
-const remover = [...atuais.keys()].filter((nome) => !saida.has(nome)).sort();
+const gravar = [...saida].filter(([nome, buf]) => atuais.get(nome) !== hash(buf)).map(([nome]) => nome).sort();
+const apagar = [...atuais.keys()].filter((nome) => !saida.has(nome)).sort();
+
+// ---------- diferença com o último envio ao projeto web ----------
+let envio = null;
+try {
+  envio = JSON.parse(fs.readFileSync(ENVIADO, 'utf8'));
+} catch {
+  envio = null;
+}
+const hashInstrucoes = hash(Buffer.from(instrucoes));
+const lista = (titulo, nomes) => console.log(`${titulo} (${nomes.length}):\n${nomes.map((n) => `  ${n}`).join('\n')}`);
+
+function pendenciasDoEnvio() {
+  if (!envio) {
+    console.log(c.yellow('Projeto web: nenhum envio registrado. Depois de subir tudo e colar as instruções, rode com --enviado.'));
+    return;
+  }
+  const subir = [...saida].filter(([nome, buf]) => envio.arquivos?.[nome] !== hash(buf)).map(([nome]) => nome).sort();
+  const remover = Object.keys(envio.arquivos ?? {}).filter((nome) => !saida.has(nome)).sort();
+  const instr = envio.instrucoes !== hashInstrucoes;
+  if (!subir.length && !remover.length && !instr) {
+    console.log(c.green(`Projeto web em dia com o último envio (${envio.data}).`));
+    return;
+  }
+  console.log(c.bold(`Desde o último envio (${envio.data}):`));
+  if (subir.length) lista('Subir de novo', subir);
+  if (remover.length) lista('Remover do projeto web', remover);
+  if (instr) console.log('instructions.md mudou: colar de novo no campo de instruções.');
+  console.log(c.dim('Depois de atualizar o projeto web: node scripts/web-files.mjs --enviado'));
+}
 
 // ---------- relatório ----------
 for (const e of erros) console.error(c.red(`erro: ${e}`));
@@ -189,18 +230,32 @@ for (const a of avisos) console.log(c.yellow(`aviso: ${a}`));
 if (erros.length) process.exit(1);
 
 console.log(`${c.bold('web-files')}  ${saida.size}/${LIMITE_ARQUIVOS} arquivos   ${c.bold('instructions.md')}  ${chars}/${LIMITE_INSTRUCOES} caracteres`);
-if (!reenviar.length && !remover.length) {
-  console.log(c.green('web-files em dia com as fontes; nada a reenviar.'));
+if (args.check) {
+  if (gravar.length || apagar.length) {
+    if (gravar.length) lista('Mudaria', gravar);
+    if (apagar.length) lista('Sairia', apagar);
+    console.log(c.yellow('web-files desatualizado: rode sem --check.'));
+    process.exit(1);
+  }
+  console.log(c.green('web-files em dia com as fontes.'));
+  pendenciasDoEnvio();
   process.exit(0);
 }
-if (reenviar.length) console.log(`${args.check ? 'Mudaria' : 'Reenviar'} (${reenviar.length}):\n${reenviar.map((n) => `  ${n}`).join('\n')}`);
-if (remover.length) console.log(`${args.check ? 'Sairia' : 'Remover do projeto web'} (${remover.length}):\n${remover.map((n) => `  ${n}`).join('\n')}`);
-if (args.check) {
-  console.log(c.yellow('web-files desatualizado: rode sem --check.'));
-  process.exit(1);
+
+if (gravar.length || apagar.length) {
+  fs.mkdirSync(OUT, { recursive: true });
+  for (const nome of gravar) fs.writeFileSync(path.join(OUT, nome), saida.get(nome));
+  for (const nome of apagar) fs.unlinkSync(path.join(OUT, nome));
+  console.log(c.dim(`web-files regerado: ${gravar.length} gravado(s), ${apagar.length} apagado(s).`));
 }
 
-fs.mkdirSync(OUT, { recursive: true });
-for (const nome of reenviar) fs.writeFileSync(path.join(OUT, nome), saida.get(nome));
-for (const nome of remover) fs.unlinkSync(path.join(OUT, nome));
-console.log(c.dim(`Gravado em ${rel(OUT)}/`));
+if (args.enviado) {
+  const agora = new Date();
+  const p2 = (n) => String(n).padStart(2, '0');
+  const data = `${agora.getFullYear()}-${p2(agora.getMonth() + 1)}-${p2(agora.getDate())} ${p2(agora.getHours())}:${p2(agora.getMinutes())}`;
+  const arquivos = Object.fromEntries([...saida].sort(([a], [b]) => a.localeCompare(b)).map(([nome, buf]) => [nome, hash(buf)]));
+  fs.writeFileSync(ENVIADO, `${JSON.stringify({ data, instrucoes: hashInstrucoes, arquivos }, null, 2)}\n`);
+  console.log(c.green(`Envio registrado em ${data}: ${saida.size} arquivos + instructions.md (${rel(ENVIADO)}).`));
+  process.exit(0);
+}
+pendenciasDoEnvio();
