@@ -5,6 +5,23 @@
 - Criar commits sem `Co-authored-by` ou qualquer indicação similar de coautoria ou atribuição ao agente.
 - Não adicionar trailers de autoria do agente nem assinaturas automáticas na mensagem do commit.
 
+## Caminhos
+Relativos à raiz deste repo (`agent-files/`).
+- Modelos: `../projects/`, por categoria (`calibracao/`, `casa-utilidades/`, `decoracao-brinquedos/`, `impressora/`, `suportes/`).
+- G-code exportado pelo Orca: `../projects/#gcodes/`.
+- OrcaSlicer (AppImage): `../tools/orca-slicer/OrcaSlicer.AppImage`.
+- Presets vivos do Orca: `~/.config/OrcaSlicer/user/default/{machine,filament,process}/`. A cópia do repo em `printers/frank-pro/orca/{machine,filament,process}/` precisa ficar idêntica; `node scripts/web-files.mjs --check` avisa divergência.
+- Perfis de sistema do Orca: `~/.config/OrcaSlicer/system/`. Nunca editar; cópias de referência em `resources/orca-defaults/`.
+- O scratchpad da sessão some no reboot; o que precisar sobreviver vai para o repo.
+
+## Estrutura do repo
+- `printers/frank-pro/`: `README.md` (estado da máquina, fonte única), `calibracao.md`, `klipper/` (snapshot só leitura do printer.cfg e mainsail.cfg), `orca/` (presets personalizados, bundle `.orca_printer` antigo, `start-n-end-gcode.gcode`).
+- `printers/frank-mini/README.md`: estado e diagnóstico da Frank Mini.
+- `to-do/`: um arquivo por ação em andamento, pendente ou sem decisão, mais um `README.md` com a tabela. Ao fechar uma ação, passar o resultado para o doc da máquina e apagar o arquivo; ao surgir uma ação nova, criar o arquivo e a linha na tabela.
+- `resources/`: `orca-defaults/` (perfis de sistema do Orca), `utils/` (comandos úteis de Klipper, Raspberry Pi e Orca) e `desktop/` (atalho do Orca).
+- `scripts/`: `frank-pro.mjs` (Moonraker, só leitura) e `web-files.mjs` (monta o projeto web).
+- `web-ui-project/`: projeto web (instruções, guia de presets e `web-files/` gerado).
+
 # Projeto — Impressão 3D
 
 ## Regras
@@ -26,34 +43,24 @@ Português BR, direto, informal e técnico. Humor/sarcasmo/palavrão ocasional c
 ## Escopo
 FDM e resina: manutenção, calibração, slicers, materiais, mecânica, eletrônica, firmware, Klipper, hotends, extrusores, cooling, sensores, upgrades, peças, miniaturas, pós-processamento e DIY.
 Principais FDM:
-- Frank Pro = Creality Ender-3 S1 Pro modificada; tratar como plataforma própria, não stock.
-- Frank Mini = Creality Ender 3 Neo em diagnóstico/modernização.
+- Frank Pro = Creality Ender-3 S1 Pro modificada; tratar como plataforma própria, não stock. Estado: `printers/frank-pro/README.md`.
+- Frank Mini = Creality Ender 3 Neo em diagnóstico/modernização. Estado: `printers/frank-mini/README.md`.
 Usar resina quando detalhe/acabamento/miniaturas justificarem.
+Ler o README da máquina e o `to-do/README.md` antes de responder sobre ela. Informação nova do usuário prevalece; atualizar o README ou o to-do quando o estado mudar.
 
-## Frank Pro — estado validado
-- Raspberry Pi com MainsailOS/Mainsail/Moonraker atuais.
-- MCU STM32F401RCT6.
-- Klipper MCU v0.11.0-0-ge02b725.
-- Build: STM32F401, bootloader 64 KiB, clock 8 MHz, USART1 PA10/PA9, 250000; app em 0x08010000.
-- Display original desconectado.
-- Taurus dual 5015 funcional.
-- Sprite Pro funcional.
-- CR Touch, homing XYZ, heaters, termistores, fans e extrusão básica validados.
-- PID hotend 21.897/1.043/114.961; mesa 73.604/1.478/916.366.
-- BLTouch z_offset 0.965.
-- Mesh `default` 4x4 salva.
-- Primeira camada validada com PLA bom.
-- Benchy em Klipper ainda não validado.
-Importante: Klipper compilado com toolchain moderna não foi aceito pelo bootloader. Solução validada: v0.11.0 com GNU Arm Embedded 10.3-2021.10/GCC 10.3.1. Não atualizar MCU nem trocar essa base sem motivo e teste controlado.
-- Klipper host v0.13.0-786-g461c4e372 (Raspberry Pi 3, MainsailOS 3.0.0), lido em 2026-10-16. A divergência host v0.13 × MCU v0.11 é intencional e validada; o aviso `deprecated_mcu_code` do Klipper é esperado. Não recomendar atualização da MCU só por essa divergência. Detalhes e o que conta como problema real: `docs/frank-pro-klipper-host-mcu.md`.
+## Frank Pro — invariantes
+- MCU na Klipper v0.11.0-0-ge02b725 com GNU Arm Embedded 10.3-2021.10 (GCC 10.3.1): o bootloader Creality não aceitou toolchain moderna. Não atualizar a MCU nem trocar essa base sem motivo e teste controlado.
+- A divergência host v0.13 × MCU v0.11 é intencional; o aviso `deprecated_mcu_code` é esperado. Não recomendar atualização da MCU só por ela. O que conta como problema real: `printers/frank-pro/README.md#firmware`.
+- Mudanças no Klipper (printer.cfg, macros, SAVE_CONFIG) são do usuário, pelo Mainsail. Entregar o trecho pronto; não editar config.
+- Não iniciar, pausar, cancelar nem retomar impressões.
 
 ## Frank Pro — consulta via Moonraker
 Ferramenta padrão de consulta e diagnóstico: `scripts/frank-pro.mjs` (Node 18+, sem dependências). Usar antes de `curl` avulso.
 - Uso: `node scripts/frank-pro.mjs --host <ip> [--param <consulta>] [--json] [--watch <s>]`. O endereço sempre entra por `--host`, nunca fixo no script; atual: `192.168.0.150` (`mainsailos.local`).
-- Consultas: `painel` (padrão), `status`, `temps`, `limites`, `versoes`, `historico` (`--limit`, `--file`), `arquivo` (`--file`), `arquivos`, `mesh`, `sensores`, `config` (`--section`), `avisos`. Detalhes em `scripts/README.md`.
-- Usos típicos: `--param historico` para tempo real × estimativa do slicer; `--param limites` para detectar `SET_VELOCITY_LIMIT` residual; `--param temps` para subtensão/throttling do Pi; `--param avisos` separa avisos reais dos esperados.
+- Consultas: `painel` (padrão), `status`, `temps`, `limites`, `versoes`, `historico` (`--limit`, `--file`), `arquivo` (`--file`), `arquivos`, `mesh`, `sensores`, `config` (`--section`), `cfg` (`--file`), `avisos`. Detalhes em `scripts/README.md`.
+- Usos típicos: `--param historico` para tempo real × estimativa do slicer; `--param limites` para detectar `SET_VELOCITY_LIMIT` residual; `--param temps` para subtensão/throttling do Pi; `--param avisos` separa avisos reais dos esperados; `--param cfg --file printer.cfg` para atualizar o snapshot em `printers/frank-pro/klipper/`.
 - **Somente leitura**: o script faz apenas GET. Não acrescentar envio de G-code, start/pause/cancel/resume, firmware restart nem escrita de config. Ações na impressora e mudanças no Klipper são do usuário, pelo Mainsail.
-- A build validada da MCU fica na constante `MCU_VALIDADA` do script; se mudar após teste controlado, atualizar junto com `docs/frank-pro-klipper-host-mcu.md`.
+- A build validada da MCU fica na constante `MCU_VALIDADA` do script; se mudar após teste controlado, atualizar junto com `printers/frank-pro/README.md`.
 
 ## Frank Pro — Orca/fluxo
 - G-code flavor: Klipper.
@@ -63,66 +70,27 @@ Ferramenta padrão de consulta e diagnóstico: `scripts/frank-pro.mjs` (Node 18+
 - `PAUSE` substitui usos antigos de `M25` e, por enquanto, `M600`.
 - Não assumir `M600` sem macro.
 - Não ativar firmware retraction sem `[firmware_retraction]`.
-- Não ativar Pressure Advance, Input Shaper ou limites agressivos antes da calibração correspondente.
-- Perfil PLA atual é baseline; não extrapolar automaticamente para outros materiais.
+- Nunca editar os presets de sistema nem os personalizados originais (`Frank Pro 0.4 nozzle`, `0.20mm Standard @Taurus`, filamentos sem "Speed"). Trabalhar nos overrides Speed.
+- Ao alterar um preset: gravar em `~/.config/OrcaSlicer/user/default/` e na cópia do repo, que precisam ficar idênticas. O Orca só lê preset alterado depois de reiniciar; se o GUI antigo salvar antes, sobrescreve a mudança. Avisar o usuário.
+- Pressure Advance mora no preset de filamento Speed do material (`enable_pressure_advance` + `pressure_advance`), com `SET_PRESSURE_ADVANCE ADVANCE=0` no `filament_end_gcode`. printer.cfg fica com PA 0.
+- Não ativar Pressure Advance, Input Shaper ou limites agressivos num material antes da calibração correspondente nele. Calibração de um material não vale para outro.
+- Fatiamento via CLI do Orca: ver a memória `orca-cli-fatiamento`.
 
-## Frank Pro — próximas etapas
-1. concluir Benchy/qualidade 3D;
-2. rotation_distance;
-3. flow/extrusion multiplier por filamento;
-4. temperatura;
-5. Pressure Advance;
-6. max volumetric flow;
-7. Input Shaper medido na própria máquina;
-8. só depois elevar velocidade/aceleração.
-Input Shaper deve ser medido na Frank Pro.
+## Frank Pro — calibração
+Ordem: rotation_distance → flow por filamento → temperatura → Pressure Advance → max volumetric flow → Input Shaper (medido na Frank Pro) → só depois elevar velocidade/aceleração.
+Status em 2026-10-18:
+- rotation_distance: feito.
+- PETG XT (Tritan HT 3D Fila): flow, temperatura e PA feitos; max volumetric flow pendente.
+- PLA 3D Fila: temperatura, vazão e PA feitos; impressão real pendente.
+- Input Shaper: pendente (ADXL).
+- Bico CHT, quando instalado: refazer vazão e PA.
+Resultados e procedimentos: `printers/frank-pro/calibracao.md`.
 
-## Frank Mini — estado atual
-Origem: Ender 3 Neo comprada nova, ficou ~2 anos guardada e foi montada depois. Sem evidência atual de erro de montagem; chicotes aparentam originais e há cola de fábrica em conectores/flat.
-
-Validado:
-- liga;
-- display acende e mostra informações;
-- termistores exibem temperatura;
-- clique/seleção do encoder funciona;
-- giro do encoder não movimenta o menu;
-- remover o botão plástico e girar a haste não muda o sintoma;
-- mesa aquece sem comando;
-- mesa continua aquecendo com display desconectado;
-- impressora desligada + Raspberry via USB: CR Touch pisca, compatível com backfeed de 5 V.
-
-Não validado:
-- revisão exata da placa/microcontrolador;
-- tensão da saída BED com target 0;
-- estado do MOSFET/gate/trilhas;
-- causa do encoder;
-- necessidade de trocar placa.
-
-Hipóteses atuais:
-- encoder: oxidação/sujeira, falha A/B, solda/trilha/cabo ou entrada da placa;
-- mesa: principal suspeita é MOSFET/circuito de potência travado em condução. Não condenar placa antes de medir.
-
-Próximo diagnóstico Frank Mini:
-- medir com multímetro a saída BED com target 0;
-- se houver tensão indevida, seguir MOSFET/gate/trilhas;
-- diagnosticar encoder separadamente;
-- não deixar Raspberry via USB com impressora desligada até tratar VBUS/backfeed.
-
-Arquitetura original relevante:
-- Bowden;
-- CR Touch;
-- Z simples;
-- hotend diferente do Sprite Pro;
-- não confundir extrusor metálico com hotend all-metal.
-
-Upgrades discutidos, ainda não instalados:
-- se placa estiver defeituosa, considerar BTT SKR Mini E3 V3 + Raspberry + Klipper em vez de repor 4.2.2;
-- dual Z é viável; kit típico com segundo motor, fuso, acoplador, suporte/porca e cabo Y;
-- com drivers Z independentes, avaliar `Z_TILT`; com um driver, usar cabo Y;
-- PEI flexível é opção;
-- hotend/heatbreak/direct drive só se necessário;
-- mover apenas o hotend da Frank Pro/S1 Pro para a Neo não é plug-and-play; Sprite exige conjunto/adaptação compatível.
-Filosofia Frank Mini: diagnosticar → reparar → validar stock funcional → melhorar só com ganho real.
+## Projeto web
+- Regras e limites: `web-ui-project/README.md` (instruções ≤ 8000 caracteres, ≤ 25 arquivos, texto escrito para LLM).
+- `web-ui-project/instructions.md` é a versão web deste arquivo: sem CLI, com o mapa dos arquivos. Ao mudar regras aqui, refletir lá.
+- Depois de mudar preset, doc de impressora, to-do, snapshot ou guia: rodar `node scripts/web-files.mjs` e informar ao usuário a lista de arquivos a reenviar ou remover.
+- Nunca editar `web-ui-project/web-files/` à mão.
 
 ## Filosofia técnica
 Priorizar solução prática. Upgrade deve resolver problema, ampliar capacidade ou trazer ganho mensurável.
@@ -149,15 +117,7 @@ Quando algo for atual, específico ou incerto, pesquisar. Prioridade: documenta�
 
 ## Continuidade
 Histórico evita repetir decisões/erros. Informação nova do usuário prevalece. Não assumir que algo planejado foi instalado: distinguir planejado, comprado, montado, configurado, testado e validado.
-
-## Fontes internas
-Consultar `fontes-internas-projeto-impressao-3d.md` antes de interpretar anexos.
-- `cura-petg.curaprofile`: baseline Cura PETG.
-- `cura-abs.curaprofile`: baseline Cura ABS.
-- `ender3-s1-pro-start-code.md` e `ender3-s1-pro-end-code.md`: históricos Marlin/OctoPrint.
-- `bed-adhesion-test-PETG-0.4mm-3layers.gcode`.
-- `bed-test-PETG-0.4mm-stringing-bridges.gcode`.
-Não inferir parâmetros pelo nome do arquivo; existência não prova uso atual após Klipper/Orca.
+Para valores de preset (herança, precedência, onde procurar): `web-ui-project/knowledge/guia-presets.md`.
 
 ## Regra final
 Ser útil antes de completo; preciso antes de confiante; direto antes de elegante. Não enrolar, inventar ou otimizar sem pedido. Quando não souber, pesquisar.

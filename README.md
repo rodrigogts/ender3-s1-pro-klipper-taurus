@@ -1,38 +1,34 @@
 # Frank Pro — Klipper e Taurus
 
-Configurações do OrcaSlicer e referências técnicas da **Frank Pro**, uma Creality Ender-3 S1 Pro modificada com Klipper, extrusor Sprite Pro e cooling Taurus dual 5015.
-
-O repositório reúne presets de impressora, filamentos e processo, rotinas de G-code e documentação para consultar e adaptar essas configurações.
+Configurações do OrcaSlicer, estado das máquinas e ferramentas da **Frank Pro**, uma Creality Ender-3 S1 Pro modificada com Klipper, extrusor Sprite Pro e cooling Taurus dual 5015. Inclui também o diagnóstico da **Frank Mini** (Ender 3 Neo).
 
 ## Conteúdo
 
-| Arquivo ou grupo | Finalidade |
+| Caminho | Finalidade |
 |---|---|
-| `Frank Pro 0.4 nozzle.json` | Preset personalizado da impressora com flavor Klipper e rotinas de G-code |
-| `Creality Taurus PLA/PETG/ABS/TPU.json` | Presets personalizados dos quatro materiais, em arquivos separados |
-| `Creality Taurus PETG XT.json` | Preset personalizado do Tritan HT da 3D Fila, herdando da base PETG |
-| `0.20mm Standard @Taurus.json` | Preset personalizado de processo |
-| `Creality Generic *.json` | Bases diretas dos filamentos Taurus |
-| `Creality Ender-3 S1 Pro 0.4 nozzle.json` | Base direta do preset Frank Pro |
-| `0.20mm Standard @Creality Ender3S1Pro.json` | Base direta do processo Taurus |
-| `Creality Ender-3 S1 Pro.json` | Identificação do modelo de impressora |
-| `Generic * @System.json` | Referências auxiliares de materiais |
-| `Frank Pro 0.4 nozzle.orca_printer` | Bundle de exportação do OrcaSlicer |
-| `start-n-end-gcode.gcode` | Referência legível das rotinas de início, encerramento e pausa |
-| `fontes-internas-projeto-impressao-3d.md` | Guia dos arquivos, heranças e precedência dos valores |
-| `inherits/` | Originais das bases e instruções para reproduzir sua unificação |
-| `scripts/` | Painel e consultas somente leitura da Frank Pro via Moonraker |
-| `AGENTS.md` | Instruções para o agente de desenvolvimento local e contexto técnico do projeto |
+| [`printers/frank-pro/`](printers/frank-pro/README.md) | Estado da máquina, [calibração](printers/frank-pro/calibracao.md), snapshot do Klipper (`klipper/`) e presets do Orca (`orca/`) |
+| [`printers/frank-mini/`](printers/frank-mini/README.md) | Estado e diagnóstico da Frank Mini |
+| [`scripts/`](scripts/README.md) | Painel e consultas somente leitura da Frank Pro via Moonraker; montagem do projeto web |
+| [`web-ui-project/`](web-ui-project/README.md) | Projeto web: instruções, guia de presets e arquivos para upload |
+| [`to-do/`](to-do/README.md) | Itens em andamento, pendentes ou sem decisão, um arquivo por ação |
+| [`resources/`](resources/README.md) | Perfis de sistema do Orca usados como base, comandos úteis (`utils/`) e atalho do Orca no desktop |
+| `AGENTS.md` | Instruções do agente da CLI local e contexto técnico do projeto |
 
-## Como consultar e adaptar
+### Presets do Orca (`printers/frank-pro/orca/`)
 
-Comece pelo [guia de fontes e configurações](fontes-internas-projeto-impressao-3d.md). Ele explica quais arquivos consultar para cada parâmetro e como interpretar os valores.
+| Tipo | Presets |
+|---|---|
+| `machine/` | `Frank Pro 0.4 nozzle`, `Frank Pro 0.4 nozzle Speed` |
+| `process/` | `0.20mm Standard @Taurus`, `… @Taurus PETG XT Speed`, `… @Taurus PLA Speed` |
+| `filament/` | `Creality Taurus PLA/PETG/ABS/TPU`, `Creality Taurus PETG XT` (Tritan HT 3D Fila), `Creality Taurus PETG XT Speed`, `Creality Taurus PLA Speed` |
 
-Os presets Taurus e Frank Pro herdam de suas bases pelo campo `inherits`. As seis bases diretas na raiz contêm seus valores herdados reunidos. Para determinar uma configuração, procure primeiro no personalizado e, se a chave estiver omitida, consulte a base correspondente. O valor explícito do personalizado prevalece.
+Os presets Speed são os calibrados (temperatura, vazão e Pressure Advance por material); os demais são o baseline. Cada preset guarda só os campos alterados e herda o resto da base indicada em `inherits`. O [guia de presets](web-ui-project/knowledge/guia-presets.md) explica a herança e onde procurar cada valor.
 
-Os arquivos originais usados nessa composição estão em `inherits/`. O [README dessa pasta](inherits/README.md) documenta os caminhos das fontes na instalação local do OrcaSlicer, o procedimento de atualização e a unificação das bases.
+A pasta também guarda `start-n-end-gcode.gcode`, a versão legível das rotinas da impressora original, e `Frank Pro 0.4 nozzle.orca_printer`, um bundle exportado do Orca em 2026-10-05, anterior aos presets Speed e ao PETG XT.
 
-Para utilizar como referência em um projeto do GPT, selecione os arquivos da raiz destinados à consulta e use as instruções próprias do seu projeto. A resolução dos sete presets personalizados pode ser feita com os respectivos arquivos-base da raiz.
+## Projeto web
+
+O projeto web recebe as instruções de `web-ui-project/instructions.md` e os arquivos de `web-ui-project/web-files/`, gerados por `node scripts/web-files.mjs`. Esses arquivos incluem os presets, as bases já unificadas e os docs das máquinas. Regras, limites e fluxo de atualização estão em [`web-ui-project/README.md`](web-ui-project/README.md).
 
 ## Aplicação em outras impressoras
 
