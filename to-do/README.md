@@ -22,6 +22,7 @@ Regras:
 | [macros-klipper.md](macros-klipper.md) | Frank Pro | validado; falta 1 teste | baixa | `macros.cfg`: `M600` estilo Marlin e v2 (sem gotinha) validados em 2026-10-18/19. Falta só testar `PREAQUECE_BICO` com o bico já quente |
 | [stray-kids-logo.md](stray-kids-logo.md) | Frank Pro | impressão pendente | baixa | Logo em 3 cores montado no Tinkercad; procedimento de troca de cor com PAUSE |
 | [orca-bundle-export.md](orca-bundle-export.md) | Frank Pro | pendente | baixa | Reexportar o `.orca_printer` (o atual é de 2026-10-05, sem os Speed) |
+| [armazenamento-filamento.md](armazenamento-filamento.md) | geral | sacos a caminho; sílica em teste | baixa | 20 sacos a vácuo PA+PE 32 × 34 cm (chegam até 24/10; os atuais perdem vácuo) e sílica laranja regenerável (testando 65 °C no secador; o usual é ~100–120 °C) |
 | [cli-fatiamento-helper.md](cli-fatiamento-helper.md) | Frank Pro | ideia | baixa | Script para fatiar pelo CLI do Orca (torres, comparações) com as correções já conhecidas |
 
 Ordem sugerida na Frank Pro: mesa-termistor e pi-fonte (confiabilidade) → pla-speed-validacao → petg-max-flowrate → bico-cht → input-shaper-adxl. O bico CHT, quando chegar, vem antes do max flowrate, porque o limite muda com ele.
