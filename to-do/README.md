@@ -9,7 +9,7 @@ Regras:
 
 | Arquivo | Máquina | Status | Prioridade | Resumo |
 |---|---|---|---|---|
-| [exclude-object.md](exclude-object.md) | Frank Pro | em andamento | alta | Ligar `[exclude_object]` no Klipper e no processo Speed do Orca para cancelar só a peça que falhou. Klipper primeiro, Orca depois |
+| [exclude-object.md](exclude-object.md) | Frank Pro | configurado; falta o teste | alta | `[exclude_object]` no Klipper e nos dois processos do Orca, para cancelar só a peça que falhou. Falta testar a exclusão numa impressão |
 | [mesa-termistor.md](mesa-termistor.md) | Frank Pro | aberto | alta | Termistor da mesa com leitura errática entre 95 e 97 °C que desarmou o verify_heater duas vezes. Suspeita no lado quente; medir ~100 kΩ mexendo o cabo |
 | [pi-fonte.md](pi-fonte.md) | Frank Pro | comprada, teste pendente | alta | Fonte nova do Pi: confirmar que somem o "Previously Under-Volted" e a queda do USB da MCU |
 | [pla-speed-validacao.md](pla-speed-validacao.md) | Frank Pro | pausado | média | Calombos no overhang do casco do Benchy em PLA Speed (Z 5–10). O casco oco reproduz em ~12 min; o teste com PA 0.025 está pronto (G-code editado) e não foi impresso. Peças sem overhang daquele tipo imprimem bem |

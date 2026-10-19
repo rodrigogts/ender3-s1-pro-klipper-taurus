@@ -1,6 +1,7 @@
 {
 	"bridge_speed": "15",
 	"brim_type": "outer_only",
+	"exclude_object": "1",
 	"from": "User",
 	"inherits": "0.20mm Standard @Creality Ender3S1Pro",
 	"internal_bridge_speed": "20",

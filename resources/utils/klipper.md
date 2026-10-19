@@ -103,7 +103,7 @@ G1 Z0.1 F300                 ; teste do papel (Z0 = bico encostando, pelo z_offs
 ```
 - `BED_SCREWS_ADJUST` faz o mesmo roteiro dos 4 parafusos sozinho. Em cada parafuso, responda `ACCEPT` (ok) ou `ADJUSTED` (mexeu, repete a volta).
 - Sempre suba o Z antes de mover em XY. Se o z_offset estiver errado, `Z0.1` pode encostar o bico na mesa.
-- Atalhos (`macros.cfg`): `CENTRO` e `CANTO N=1..4` sobem a 5 mm e levam o bico ao centro ou ao parafuso N.
+- Atalhos (`macros.cfg`): `CENTRO` e `CANTO N=1..4` sobem a 5 mm e levam o bico ao centro ou ao parafuso N; com `FOLHA=1`, descem até Z0.1. `SOLTA_XY` desliga só X e Y para mover o bico com a mão (o Z fica travado); rodar `G28 X Y` antes de mover pelo Klipper.
 
 ## Troca de filamento (cor por camada, Klipper)
 Com a impressora Speed, o "Add color change" da barra de camadas do Orca gera `M600`, a troca estilo Marlin do `macros.cfg`. Outros jeitos de chamar: `SET_PAUSE_AT_LAYER LAYER=<n> MACRO=M600` no console, ou `M600` no G-code depois de `SET_PRINT_STATS_INFO CURRENT_LAYER=<n>`. Daí em diante, seguir a janela do Mainsail (Carregar e purgar → Retomar). Detalhes em `to-do/macros-klipper.md`.
