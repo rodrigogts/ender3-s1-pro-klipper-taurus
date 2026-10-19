@@ -67,8 +67,8 @@ Ferramenta padrão de consulta e diagnóstico: `scripts/frank-pro.mjs` (Node 18+
 - Z-offset do slicer: 0.
 - Start G-code: `BED_MESH_PROFILE LOAD=default`.
 - Não usar `M420 S1`.
-- `PAUSE` substitui usos antigos de `M25` e, por enquanto, `M600`.
-- Não assumir `M600` sem macro.
+- `PAUSE` substitui usos antigos de `M25` e é o que os presets usam na pausa e na troca de filamento.
+- `M600` (`macros.cfg`, estilo Marlin) testado e funcionando desde 2026-10-18: na troca de cor por camada, o usuário põe `M600` como custom G-code no Orca na primeira camada da cor nova. Detalhes em `resources/utils/klipper.md` e `to-do/macros-klipper.md`.
 - Não ativar firmware retraction sem `[firmware_retraction]`.
 - Nunca editar os presets de sistema nem os personalizados originais (`Frank Pro 0.4 nozzle`, `0.20mm Standard @Taurus`, filamentos sem "Speed"). Trabalhar nos overrides Speed.
 - Ao alterar um preset: gravar em `~/.config/OrcaSlicer/user/default/` e na cópia do repo, que precisam ficar idênticas. O Orca só lê preset alterado depois de reiniciar; se o GUI antigo salvar antes, sobrescreve a mudança. Avisar o usuário.

@@ -54,7 +54,8 @@ const DOCS = {
   'guia-presets.md': 'web-ui-project/knowledge/guia-presets.md',
   'to-do.md': 'to-do/',
   // .txt para o upload não recusar a extensão .cfg
-  'frank-pro-klipper.cfg.txt': ['printers/frank-pro/klipper/printer.cfg', 'printers/frank-pro/klipper/mainsail.cfg'],
+  'frank-pro-klipper.cfg.txt': ['printers/frank-pro/klipper/printer.cfg', 'printers/frank-pro/klipper/macros.cfg',
+    'printers/frank-pro/klipper/mainsail.cfg'],
 };
 
 const COLOR = process.stdout.isTTY && !process.env.NO_COLOR;

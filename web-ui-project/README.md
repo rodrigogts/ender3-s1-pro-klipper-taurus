@@ -32,7 +32,7 @@ Nunca editar `web-files/` à mão: o script apaga e recria. Editar a fonte.
 | bases `Creality Generic *.json`, `Creality Ender-3 S1 Pro 0.4 nozzle.json`, `0.20mm Standard @Creality Ender3S1Pro.json` (6) | geradas pelo script a partir de `resources/orca-defaults/` |
 | `frank-pro.md` | `printers/frank-pro/README.md` |
 | `frank-pro-calibracao.md` | `printers/frank-pro/calibracao.md` |
-| `frank-pro-klipper.cfg.txt` | `printers/frank-pro/klipper/printer.cfg` + `mainsail.cfg`, concatenados (snapshot via `scripts/frank-pro.mjs --param cfg`) |
+| `frank-pro-klipper.cfg.txt` | `printers/frank-pro/klipper/printer.cfg` + `macros.cfg` + `mainsail.cfg`, concatenados (snapshot via `scripts/frank-pro.mjs --param cfg`) |
 | `to-do.md` | `to-do/README.md` + todos os `to-do/*.md`, concatenados |
 | `frank-mini.md` | `printers/frank-mini/README.md` |
 | `guia-presets.md` | `knowledge/guia-presets.md` |
@@ -48,6 +48,7 @@ Atualizar o snapshot do Klipper (somente leitura, GET no Moonraker):
 ```sh
 node scripts/frank-pro.mjs --host 192.168.0.150 --param cfg --file printer.cfg > printers/frank-pro/klipper/printer.cfg
 node scripts/frank-pro.mjs --host 192.168.0.150 --param cfg --file mainsail.cfg > printers/frank-pro/klipper/mainsail.cfg
+node scripts/frank-pro.mjs --host 192.168.0.150 --param cfg --file macros.cfg > printers/frank-pro/klipper/macros.cfg
 ```
 
 ## Fora do projeto web, e por quê
