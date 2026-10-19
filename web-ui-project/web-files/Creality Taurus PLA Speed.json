@@ -1,0 +1,45 @@
+{
+	"enable_pressure_advance": [
+		"1"
+	],
+	"fan_max_speed": [
+		"40"
+	],
+	"fan_min_speed": [
+		"30"
+	],
+	"filament_end_gcode": [
+		"; filament end gcode \n; ZERA O PA PARA NAO VAZAR PARA A PROXIMA IMPRESSAO\nSET_PRESSURE_ADVANCE ADVANCE=0\n"
+	],
+	"filament_extruder_variant": [
+		"Direct Drive Standard"
+	],
+	"filament_settings_id": [
+		"Creality Taurus PLA Speed"
+	],
+	"from": "User",
+	"full_fan_speed_layer": [
+		"3"
+	],
+	"hot_plate_temp_initial_layer": [
+		"65"
+	],
+	"inherits": "Creality Generic PLA",
+	"name": "Creality Taurus PLA Speed",
+	"nozzle_temperature": [
+		"225"
+	],
+	"nozzle_temperature_initial_layer": [
+		"225"
+	],
+	"nozzle_temperature_range_high": [
+		"230"
+	],
+	"overhang_fan_speed": [
+		"80"
+	],
+	"pressure_advance": [
+		"0.038"
+	],
+	"version": "2.3.2.75"
+}

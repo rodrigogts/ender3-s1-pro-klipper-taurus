@@ -1,0 +1,571 @@
+<!-- fonte: to-do/README.md -->
+# to-do
+
+Um arquivo por ação em andamento, pendente ou ainda sem decisão. Cada arquivo traz status, fatos, hipóteses, próximos passos e o critério de fechamento.
+
+Regras:
+- Ação fechada: o resultado vai para o doc da máquina (`printers/<máquina>/README.md` ou `calibracao.md`) e o arquivo daqui é apagado. O histórico fica no git.
+- Fato novo: atualizar o campo `atualizado` e o status.
+- Status possíveis: em andamento, pendente, pedido/comprado, aberto, decisão pendente, decisão tomada, ideia.
+
+| Arquivo | Máquina | Status | Prioridade | Resumo |
+|---|---|---|---|---|
+| [mesa-termistor.md](mesa-termistor.md) | Frank Pro | aberto | alta | Termistor da mesa com leitura errática entre 95 e 97 °C que desarmou o verify_heater duas vezes. Suspeita no lado quente; medir ~100 kΩ mexendo o cabo |
+| [pi-fonte.md](pi-fonte.md) | Frank Pro | comprada, teste pendente | alta | Fonte nova do Pi: confirmar que somem o "Previously Under-Volted" e a queda do USB da MCU |
+| [pla-speed-validacao.md](pla-speed-validacao.md) | Frank Pro | em andamento | alta | Benchy PLA Speed com calombos na proa e numa lateral (Z 5–10), pior com SCV 5; o SCV 1 só atenuava. Teste curto de casco duplo (15 min) para separar refrigeração × direção |
+| [petg-max-flowrate.md](petg-max-flowrate.md) | Frank Pro | pendente | média | Max flowrate do PETG XT a 270 °C e limite de ~85% no `filament_max_volumetric_speed` |
+| [bico-cht.md](bico-cht.md) | Frank Pro | pedido, em trânsito | média | Bico CHT 0.4 latão + CuCrZr para mais vazão; depois de instalar, refazer z_offset, vazão e PA |
+| [input-shaper-adxl.md](input-shaper-adxl.md) | Frank Pro | pendente | média | ADXL345 + Input Shaper medido na própria máquina antes de subir acelerações |
+| [frank-mini-diagnostico.md](frank-mini-diagnostico.md) | Frank Mini | pendente | média | Mesa que aquece sem comando (MOSFET?) e encoder que não gira o menu |
+| [abs-calibracao.md](abs-calibracao.md) | Frank Pro | pendente | baixa | Criar o ABS Speed e calibrar temperatura, vazão e PA do ABS |
+| [speed-como-padrao.md](speed-como-padrao.md) | Frank Pro | decisão pendente | baixa | Tornar o Speed o perfil padrão: por material, conforme for validado, ou renomear tudo no fim |
+| [trilhos-lineares.md](trilhos-lineares.md) | Frank Pro | decisão tomada: não agora | baixa | Trilhos lineares XYZ: sem ganho comprovado na S1 Pro; reabrir só com evidência de folga ou ringing |
+| [macros-klipper.md](macros-klipper.md) | Frank Pro | proposta, instalação pelo usuário | média | `macros.cfg`: `M600` estilo Marlin (estaciona no canto sup. esquerdo, janela no Mainsail, purga, volta XY-alto/desce), `CENTRO`, `CANTO N=` e `PREAQUECE_BICO` (start G-code sem derrubar bico quente) |
+| [stray-kids-logo.md](stray-kids-logo.md) | Frank Pro | impressão pendente | baixa | Logo em 3 cores montado no Tinkercad; procedimento de troca de cor com PAUSE |
+| [orca-bundle-export.md](orca-bundle-export.md) | Frank Pro | pendente | baixa | Reexportar o `.orca_printer` (o atual é de 2026-10-05, sem os Speed) |
+| [cli-fatiamento-helper.md](cli-fatiamento-helper.md) | Frank Pro | ideia | baixa | Script para fatiar pelo CLI do Orca (torres, comparações) com as correções já conhecidas |
+
+Ordem sugerida na Frank Pro: mesa-termistor e pi-fonte (confiabilidade) → pla-speed-validacao → petg-max-flowrate → bico-cht → input-shaper-adxl. O bico CHT, quando chegar, vem antes do max flowrate, porque o limite muda com ele.
+
+<!-- fonte: to-do/abs-calibracao.md -->
+# Calibrar ABS (temperatura, vazão e PA) e criar o ABS Speed
+- status: pendente, sem data
+- máquina: Frank Pro
+- prioridade: baixa
+- atualizado: 2026-10-18
+
+## Fatos
+- existe só o baseline `Creality Taurus ABS`: 245 °C (250 na primeira camada), faixa até 250, fan 20%, overhang 35%, herda de `Creality Generic ABS` (mesa 100 °C, max volumetric 12)
+- nada de ABS foi calibrado no Klipper
+- marca e etiqueta do ABS em uso: não informadas
+- a mesa tem limite de 110 °C (`max_temp`)
+- regra do projeto: não ativar PA no ABS antes da torre no próprio ABS
+
+## Hipóteses
+- O ABS pede cooling baixo e é sensível a corrente de ar. Gabinete: não informado se existe.
+- Pela tendência PLA 0.038 × PETG 0.125, o PA do ABS deve ficar em torno do do PLA, mas isso não é base para pular a torre.
+
+## Próximos passos
+1. Anotar a faixa de temperatura da etiqueta do ABS.
+2. Criar `Creality Taurus ABS Speed` como cópia do baseline e um processo `0.20mm Standard @Taurus ABS Speed`, com PA desligado e `SET_PRESSURE_ADVANCE ADVANCE=0` no end gcode, igual aos outros Speed.
+3. Fazer a vazão no ar (procedimento em `printers/frank-pro/calibracao.md`) e escolher a temperatura.
+4. Fazer a torre de PA com o filamento ABS Speed.
+5. Imprimir um Benchy e conferir empeno e delaminação.
+
+## Fecha quando
+- ABS Speed com temperatura e PA medidos e um Benchy aprovado.
+
+<!-- fonte: to-do/bico-cht.md -->
+# Trocar para o bico CHT (maior vazão)
+- status: pedido feito, vindo da China (não chegou); não instalado
+- máquina: Frank Pro
+- prioridade: média
+- atualizado: 2026-10-18
+
+## Fatos
+- peça: kit de 2 bicos CHT MK8 0.4 mm, latão com núcleo CuCrZr, sem garantia
+- objetivo: mais vazão no Sprite Pro, para ter folga acima dos ~8 mm³/s dos processos Speed
+- escolha: latão/cobre em vez de aço endurecido, porque conduz melhor o calor. Os filamentos em uso não são abrasivos.
+- hoje, bico original 0.4: PETG XT a 270 °C perde ~2% a 10 mm³/s; PLA a 225 °C perde 0.2% a 12 mm³/s
+
+## Próximos passos (depois de instalar)
+1. Apertar a quente, conforme o procedimento do hotend.
+2. Refazer o z_offset (`PROBE_CALIBRATE`, `SAVE_CONFIG`).
+3. Opcional: PID do hotend, porque a massa térmica muda.
+4. Refazer a vazão no ar no PETG XT e no PLA (ver `printers/frank-pro/calibracao.md`).
+5. Medir o max flowrate (ver `petg-max-flowrate.md`) e ajustar `filament_max_volumetric_speed`.
+6. Refazer a torre de PA dos dois materiais. O PA depende do bico.
+7. Só depois disso pensar em subir as velocidades dos processos Speed.
+
+## Fecha quando
+- Bico instalado, com z_offset, vazão e PA novos registrados e um Benchy aprovado.
+
+<!-- fonte: to-do/cli-fatiamento-helper.md -->
+# Script de fatiamento pelo CLI do Orca
+- status: ideia; nada feito
+- máquina: Frank Pro
+- prioridade: baixa
+- atualizado: 2026-10-18
+
+## Fatos
+- os helpers que achatam presets e fatiam pelo CLI (flatten.py e slice.sh) viviam no scratchpad e sumiram no reboot de 2026-10-18
+- foram usados para: torres de PA, Benchy de comparação e conferência de G-code sem abrir o GUI
+- as pegadinhas do CLI estão documentadas em `resources/utils/orca-slicer.md`
+- `scripts/web-files.mjs` já tem a função de resolução de herança (`resolve`)
+
+## Proposta
+- `scripts/orca-slice.mjs`:
+  - achata impressora, processo e filamento a partir de `~/.config/OrcaSlicer/` (pais em `system/Creality/`);
+  - aplica as correções do CLI (`type`, `compatible_printers`, `curr_bed_type`, `initial_layer_speed`);
+  - aceita overrides de processo (ex.: torre de PA);
+  - fatia em diretório temporário e copia o G-code para `../projects/#gcodes/`.
+
+## Fecha quando
+- Script feito e validado contra um G-code do GUI, ou descartado.
+
+<!-- fonte: to-do/frank-mini-diagnostico.md -->
+# Frank Mini: diagnóstico da mesa que aquece sozinha e do encoder
+- status: pendente (medições não feitas)
+- máquina: Frank Mini (Ender 3 Neo)
+- prioridade: média (a mesa aquece sem comando, então há risco térmico)
+- atualizado: 2026-10-18
+
+O estado completo, as hipóteses e o plano estão em `printers/frank-mini/README.md`.
+
+## Próximos passos
+1. Medir com multímetro a tensão da saída BED com target 0.
+2. Se houver tensão: seguir MOSFET, gate e trilhas antes de condenar a placa.
+3. Diagnosticar o encoder separadamente.
+4. Não deixar o Raspberry no USB com a impressora desligada (backfeed de 5 V).
+
+## Riscos
+- Mesa aquecendo sem comando: não deixar ligada sem supervisão até medir.
+
+## Fecha quando
+- A causa da mesa foi identificada e corrigida (ou a placa foi trocada) e o encoder funciona.
+
+<!-- fonte: to-do/input-shaper-adxl.md -->
+# Input Shaper com ADXL345
+- status: pendente; compra do ADXL não informada
+- máquina: Frank Pro
+- prioridade: média
+- atualizado: 2026-10-18
+
+## Fatos
+- Input Shaper não está configurado. Regra: medir na própria Frank Pro, sem copiar valor de outra máquina.
+- mesa móvel no Y (cartesiana bed-slinger): medir X no cabeçote e Y na mesa
+- o ADXL mede uma vez: salva o resultado e depois pode ser removido
+- hoje, accel máx. 2000 e SCV 5; os processos Speed usam de 650 a 2000 mm/s²
+- os cubos A/B (2026-10-16) mostraram que a aceleração não causava os defeitos vistos. Ringing ainda não foi avaliado.
+
+## Hipóteses
+- Ligar o ADXL nos pinos SPI do Pi exige instalar o "Klipper host MCU" (processo Linux no Pi). Isso não mexe na MCU STM32 nem na build validada.
+
+## Próximos passos
+1. Comprar o ADXL345 e o cabo, se ainda não tiver.
+2. Montar o suporte no cabeçote (X) e na mesa (Y).
+3. O usuário aplica no Mainsail as seções `[mcu rpi]`, `[adxl345]` e `[resonance_tester]` (com `probe_points`). O agente entrega o trecho pronto.
+4. Rodar `ACCELEROMETER_QUERY`, `MEASURE_AXES_NOISE`, `SHAPER_CALIBRATE` e `SAVE_CONFIG`.
+5. Revisar `max_accel` com base na aceleração máxima recomendada pelo shaper.
+6. Só então subir as acelerações dos processos Speed.
+
+## Fecha quando
+- `[input_shaper]` salvo, com shaper e frequência medidos, e as acelerações revisadas.
+
+<!-- fonte: to-do/macros-klipper.md -->
+# Macros: troca de filamento estilo Marlin (M600), posicionamento do bico e pré-aquecimento
+- status: proposta; o usuário aplica no Mainsail
+- máquina: Frank Pro
+- prioridade: média
+- atualizado: 2026-10-18
+
+## Contexto
+- O usuário troca de cor por camada com um G-code custom, como fazia no Marlin. Não usa o "color change" do Orca.
+- Fluxo do Marlin que ele quer repetir:
+  1. guarda a camada e a posição;
+  2. retrai 1 mm;
+  3. estaciona no canto superior esquerdo (X mín., Y máx.) e pausa;
+  4. tira o filamento, coloca o novo e confirma no visor;
+  5. o bico vai ao canto inferior esquerdo, purga e volta ao superior esquerdo;
+  6. resume: volta ao ponto da impressão e desfaz a retração.
+- No Klipper não há visor. A confirmação vira janela com botões no Mainsail (`action:prompt_*`, o mesmo recurso que o RESUME do mainsail.cfg já usa).
+- Hoje não existe macro M600. As macros abaixo ficam num arquivo próprio (`macros.cfg`) incluído pelo printer.cfg; não mexem na MCU nem na build validada.
+- `PREAQUECE_BICO`: o start G-code faz `M104 S170` enquanto a mesa aquece. Se o bico já está quente (ex.: 225 °C depois de um teste), isso o derruba para 170 e o `M109` espera reaquecer; o usuário removeu a linha à mão duas vezes em 2026-10-18. A macro só pré-aquece se o alvo atual estiver abaixo do valor pedido.
+
+## Fluxo com as macros
+1. A impressão chega no `M600` (G-code custom na camada, ou `SET_PAUSE_AT_LAYER LAYER=<n> MACRO=M600` no console).
+2. O `M600`:
+   - guarda o idle_timeout atual e põe 1800 s;
+   - roda o `PAUSE` do mainsail.cfg, que salva posição e estado, retrai 1 mm e estaciona em X0 Y220, ≥10 mm acima da peça;
+   - descarrega 50 mm (ponta: +10 mm, depois −50 mm);
+   - abre a janela "Troca de filamento".
+3. Tirar o filamento, colocar o novo até o extrusor pegar e clicar **Carregar e purgar** (`CARREGA_TROCA`): vai a X0 Y0, empurra e purga 50 mm, retrai 1 mm, espera 2 s e volta a X0 Y220.
+4. Na janela seguinte: **Purgar mais** (`CARREGA_TROCA L=20`) ou **Retomar** (`RETOMA_TROCA`).
+5. O `RETOMA_TROCA` fecha a janela, anda em XY até em cima do ponto da pausa (ainda alto), desce na vertical e roda o `RESUME`. O `RESUME` desfaz a retração de 1 mm no próprio ponto e restaura o idle_timeout; o movimento de volta dele fica nulo, porque o bico já está na posição salva.
+
+Movimento em Z (sem risco de bater na peça):
+- ida (`PAUSE`): sobe o Z primeiro, depois anda em XY;
+- purga (`CARREGA_TROCA`): anda só em XY, na altura de estacionamento;
+- volta (`RETOMA_TROCA`): XY no alto, depois desce na vertical. Não usar o `RESUME` direto nesta troca: ele volta em diagonal, descendo enquanto anda, e chega rente ao topo da peça.
+
+## Instalação (o usuário, no Mainsail, com a impressora parada)
+1. Máquina (Machine) → pasta de config → criar o arquivo `macros.cfg` e colar o bloco abaixo inteiro.
+2. Abrir o `printer.cfg` e, logo abaixo de `[include mainsail.cfg]`, acrescentar a linha `[include macros.cfg]`.
+3. "Salvar e reiniciar". Isso reinicia o Klipper: fazer só sem impressão rodando.
+4. Avisar o agente, que confere por GET se as macros carregaram e então:
+   - troca no start G-code do preset `Frank Pro 0.4 nozzle Speed` (repo e Orca) o `M104 S170` por `PREAQUECE_BICO S=170`. Só depois da instalação: sem a macro, o Klipper para a impressão com comando desconhecido;
+   - atualiza os snapshots em `printers/frank-pro/klipper/` (incluindo `macros.cfg`) e o projeto web.
+
+## Arquivo `macros.cfg`
+```ini
+# Macros da Frank Pro. Incluido pelo printer.cfg com [include macros.cfg].
+
+# ---------- Pre-aquecimento ----------
+# Usado no start G-code no lugar de M104 S170: nao derruba um bico que ja esta mais quente.
+[gcode_macro PREAQUECE_BICO]
+description: Pre-aquece o bico so se o alvo atual for menor que S (padrao 170)
+gcode:
+  {% set alvo = params.S|default(170)|float %}
+  {% if printer.extruder.target < alvo %}
+    M104 S{alvo}
+  {% endif %}
+
+# ---------- Troca de filamento estilo Marlin ----------
+# Canto superior esquerdo (X min., Y max.) = estacionar; inferior esquerdo = purgar.
+# Coordenadas na borda da area de 220 x 220; ajuste aqui se a purga cair em cima da peca.
+[gcode_macro M600]
+description: Troca de filamento: pausa, estaciona no canto sup. esquerdo e descarrega
+variable_park_x: 0
+variable_park_y: 220
+variable_purge_x: 0
+variable_purge_y: 0
+variable_lift: 10          ; mm acima da posicao atual (minimo 20 mm de altura absoluta)
+variable_unload: 50        ; mm de descarga; UNLOAD=0 pula
+variable_pos_x: 0          ; posicao da pausa, gravada pelo M600 para o RETOMA_TROCA
+variable_pos_y: 0
+variable_pos_z: 0
+gcode:
+  {% if printer.pause_resume.is_paused %}
+    {action_raise_error("M600: impressao ja esta pausada")}
+  {% endif %}
+  {% set z = [printer.gcode_move.gcode_position.z + lift, 20]|max %}
+  {% set unload_mm = params.UNLOAD|default(unload)|float %}
+  {% set pos = printer.gcode_move.gcode_position %}
+  SET_GCODE_VARIABLE MACRO=M600 VARIABLE=pos_x VALUE={pos.x}
+  SET_GCODE_VARIABLE MACRO=M600 VARIABLE=pos_y VALUE={pos.y}
+  SET_GCODE_VARIABLE MACRO=M600 VARIABLE=pos_z VALUE={pos.z}
+  # PAUSE do mainsail.cfg restaura este valor no RESUME
+  SET_GCODE_VARIABLE MACRO=RESUME VARIABLE=restore_idle_timeout VALUE={printer.configfile.settings.idle_timeout.timeout}
+  SET_IDLE_TIMEOUT TIMEOUT=1800
+  PAUSE X={park_x} Y={park_y} Z_MIN={z}
+  {% if unload_mm > 0 and printer.extruder.can_extrude %}
+    SAVE_GCODE_STATE NAME=m600_unload
+    M83
+    G1 E10 F300
+    G1 E-{unload_mm} F1800
+    RESTORE_GCODE_STATE NAME=m600_unload
+  {% endif %}
+  RESPOND TYPE=command MSG="action:prompt_begin Troca de filamento"
+  RESPOND TYPE=command MSG="action:prompt_text Tire o filamento (alavanca do Sprite), coloque o novo ate o extrusor puxar e confirme."
+  RESPOND TYPE=command MSG="action:prompt_footer_button Carregar e purgar|CARREGA_TROCA|primary"
+  RESPOND TYPE=command MSG="action:prompt_show"
+
+[gcode_macro CARREGA_TROCA]
+description: Troca de filamento: purga no canto inf. esquerdo e volta a estacionar (L=mm, padrao 50)
+gcode:
+  {% set m = printer["gcode_macro M600"] %}
+  RESPOND TYPE=command MSG="action:prompt_end"
+  {% if not printer.pause_resume.is_paused %}
+    {action_raise_error("CARREGA_TROCA: so durante a pausa do M600")}
+  {% endif %}
+  {% if not printer.extruder.can_extrude %}
+    {action_raise_error("CARREGA_TROCA: bico frio; aqueca com M109 e rode de novo")}
+  {% endif %}
+  SAVE_GCODE_STATE NAME=m600_load
+  G90
+  G1 X{m.purge_x} Y{m.purge_y} F6000
+  M83
+  G1 E{params.L|default(50)|float} F180
+  G1 E-1 F2100               ; o RESUME desfaz 1 mm
+  G4 P2000
+  G1 X{m.park_x} Y{m.park_y} F6000
+  RESTORE_GCODE_STATE NAME=m600_load
+  RESPOND TYPE=command MSG="action:prompt_begin Troca de filamento"
+  RESPOND TYPE=command MSG="action:prompt_text Purga feita. Limpe o bico com pinca e retome, ou purgue mais."
+  RESPOND TYPE=command MSG="action:prompt_button Purgar mais 20 mm|CARREGA_TROCA L=20|secondary"
+  RESPOND TYPE=command MSG="action:prompt_footer_button Retomar|RETOMA_TROCA|primary"
+  RESPOND TYPE=command MSG="action:prompt_show"
+
+[gcode_macro RETOMA_TROCA]
+description: Troca de filamento: volta como o Marlin (XY alto, desce na vertical) e retoma
+gcode:
+  {% set m = printer["gcode_macro M600"] %}
+  RESPOND TYPE=command MSG="action:prompt_end"
+  {% if not printer.pause_resume.is_paused %}
+    {action_raise_error("RETOMA_TROCA: nao ha pausa do M600 para retomar")}
+  {% endif %}
+  G90
+  G1 X{m.pos_x} Y{m.pos_y} F6000   ; XY primeiro, ainda na altura de estacionamento
+  G1 Z{m.pos_z} F600               ; desce na vertical ate o ponto da pausa
+  RESUME                           ; desfaz 1 mm no proprio ponto e continua (ja esta na posicao salva)
+
+# ---------- Posicionamento ----------
+[gcode_macro CENTRO]
+description: Bico no centro da mesa, 5 mm acima
+gcode:
+  {% if "xyz" not in printer.toolhead.homed_axes %}
+    G28
+  {% endif %}
+  G90
+  G1 Z5 F600
+  G1 X110 Y110 F6000
+
+[gcode_macro CANTO]
+description: Bico sobre o parafuso N (1 frente-esq, 2 frente-dir, 3 tras-dir, 4 tras-esq), 5 mm acima
+gcode:
+  {% set pts = [[20, 29], [195, 29], [195, 198], [20, 198]] %}
+  {% set n = params.N|default(1)|int %}
+  {% if n < 1 or n > 4 %}
+    {action_raise_error("CANTO: use N=1, 2, 3 ou 4")}
+  {% endif %}
+  {% if "xyz" not in printer.toolhead.homed_axes %}
+    G28
+  {% endif %}
+  G90
+  G1 Z5 F600
+  G1 X{pts[n-1][0]} Y{pts[n-1][1]} F6000
+```
+
+## Como inserir a troca na impressão
+- **Pelo console, sem editar o G-code** (preferido): com a impressão rodando, `SET_PAUSE_AT_LAYER LAYER=<n> MACRO=M600`, onde n é a primeira camada da cor nova, como no preview do Orca. Funciona porque a impressora Speed emite `SET_PRINT_STATS_INFO CURRENT_LAYER=<n>` antes de subir para a camada n. É uma troca por comando; repita depois de cada troca.
+- **G-code custom**: inserir `M600` na linha seguinte a `SET_PRINT_STATS_INFO CURRENT_LAYER=<n>`. Pelo Orca: "Add custom G-code" na camada. Pelo terminal:
+  ```sh
+  sed -i '/^SET_PRINT_STATS_INFO CURRENT_LAYER=<n>$/a M600' arquivo.gcode
+  grep -n -A1 "CURRENT_LAYER=<n>$" arquivo.gcode   # conferir
+  ```
+
+## Riscos e limites
+- **Coordenadas:**
+  - Y alto = bico na parte de trás da mesa (bed-slinger: a mesa vem para a frente).
+  - X0/Y0/Y220 são a borda da área de impressão. Se a peça ocupar um canto, mude `purge_*`/`park_*` antes.
+  - Fora da área (X até −15, Y até 238) a mesa pode não estar embaixo; não confirmado.
+- **Temperatura:** a pausa mantém o alvo do bico. Para outro material, `M109 S<nova>` antes de "Carregar e purgar". O PA e o fan continuam os do filamento fatiado.
+- **Descarga:** 50 mm podem não tirar todo o filamento do Sprite; termine puxando com a alavanca pressionada.
+- **Janela:** os botões dependem do suporte do Mainsail a `action:prompt_*`, que o RESUME do mainsail.cfg já usa. Se a janela não aparecer, rodar `CARREGA_TROCA` e `RETOMA_TROCA` pelo console.
+- **idle_timeout:** o M600 põe 30 min. Passou disso, o Klipper desliga heaters e motores (M84), o home se perde e a impressão não retoma.
+- **Testar sem impressão:** depois do "Salvar e reiniciar", `CENTRO`, `CANTO N=1` e um G-code curto de teste com `M600` no meio (não testar o M600 parado, porque o PAUSE fora de impressão não tem o que retomar).
+- **PREAQUECE_BICO:** testar com `M104 S225`, depois `PREAQUECE_BICO S=170` (o alvo deve continuar 225) e com o bico em 0 (o alvo deve ir a 170).
+
+## Fecha quando
+- O usuário instalar e testar uma troca real. Registrar em `printers/frank-pro/README.md` (seção Klipper → macros), atualizar a regra "não existe M600" no AGENTS.md, nas instruções web e nos docs, e incluir `macros.cfg` no `frank-pro-klipper.cfg.txt` do projeto web (`DOCS` em `scripts/web-files.mjs`).
+
+<!-- fonte: to-do/mesa-termistor.md -->
+# Leitura errática do termistor da mesa (desarme do verify_heater)
+- status: aberto; contornado, porque a mesa a 105 °C fica estável
+- máquina: Frank Pro
+- prioridade: alta (segurança térmica)
+- atualizado: 2026-10-18
+
+## Fatos
+- 2026-10-17: duas impressões abortadas no aquecimento com `Heater heater_bed not heating at expected rate`
+- leitura entre 95 e 97 °C com potência 100%: quedas de ~7 °C em 7 s e saltos de +3.8 a +6.2 °C em 1 s. Fisicamente impossível, então é falha de medição. Saltos menores já apareciam em sessões anteriores.
+- o borne parafusado foi aberto: sem solda solta, tudo normal. Num aquecimento só da mesa depois disso, os saltos voltaram entre 95 e 97 °C, mas passou e ficou estável a 105 °C.
+- impressão de 3h26m a 105 °C: estável (±0.02 °C), zero saltos acima de 1.5 °C/s
+- sensor: EPCOS 100K B57560G104F, no pino PC4
+
+## Hipóteses
+- principal: defeito do lado quente (solda do termistor na mesa, o próprio termistor ou o fio no trecho que flexiona com o Y), sensível à temperatura nessa faixa
+- menos provável: conector na placa ou interferência
+
+## Próximos passos
+1. Mesa fria: medir a resistência do termistor (~100 kΩ a 25 °C) mexendo o cabo ao longo do curso do Y. Uma variação ao mexer indica fio ou solda.
+2. Inspecionar a solda e o fio no termistor, embaixo da mesa.
+3. Se confirmar, trocar o termistor (ou o chicote) pelo mesmo tipo e fazer o PID da mesa de novo (`PID_CALIBRATE HEATER=heater_bed TARGET=105`).
+4. Para monitorar, `node scripts/frank-pro.mjs --host 192.168.0.150 --param temps --watch 1` durante o aquecimento.
+
+## Riscos
+- Leitura baixa faz a mesa ficar em potência máxima. O `verify_heater` é o que protege: NÃO aumentar a tolerância dele para "resolver" o desarme.
+
+## Fecha quando
+- A causa foi achada e corrigida, e um aquecimento de 25 a 105 °C passa sem salto acima de 1.5 °C/s.
+
+<!-- fonte: to-do/orca-bundle-export.md -->
+# Exportar de novo o bundle .orca_printer
+- status: pendente (ação do usuário no GUI)
+- máquina: Frank Pro
+- prioridade: baixa
+- atualizado: 2026-10-18
+
+## Fatos
+- `printers/frank-pro/orca/Frank Pro 0.4 nozzle.orca_printer` é de 2026-10-05: não tem PETG XT nem os Speed
+- só dá para regenerar pelo GUI do Orca (exportar o bundle da impressora), não pelo CLI
+
+## Próximos passos
+1. No Orca: exportar o bundle da impressora `Frank Pro 0.4 nozzle Speed`, com os filamentos e processos.
+2. Salvar em `printers/frank-pro/orca/`, decidindo se substitui o antigo ou se fica com nome novo.
+3. Atualizar a menção ao bundle no `README.md` da raiz.
+
+## Fecha quando
+- Bundle atualizado no repo, ou decidido que não é mais necessário (os JSON individuais já cobrem tudo).
+
+<!-- fonte: to-do/petg-max-flowrate.md -->
+# Medir o max flowrate do PETG XT e limitar a vazão no preset
+- status: pendente
+- máquina: Frank Pro
+- prioridade: média
+- atualizado: 2026-10-18
+
+## Fatos
+- `Creality Taurus PETG XT Speed`: 270 °C, PA 0.125, VALIDADO em qualidade
+- `filament_max_volumetric_speed` 10 mm³/s, herdado e não medido
+- vazão no ar a 270 °C: ~2% de perda a 10 mm³/s (F250). Acima disso não foi testado.
+- os processos Speed puxam ~8 mm³/s (paredes internas e infill a 90 mm/s)
+
+## Próximos passos
+1. Rodar o teste de Max flowrate do Orca (menu Calibração) com o filamento PETG XT Speed a 270 °C.
+2. Pegar a maior vazão sem falha de superfície.
+3. Gravar `filament_max_volumetric_speed` = ~85% desse valor, só no `Creality Taurus PETG XT Speed`, no repo e no Orca.
+4. `node scripts/web-files.mjs`.
+
+## Fecha quando
+- Valor medido registrado em `printers/frank-pro/calibracao.md` e aplicado no preset.
+
+## Observação
+- Com o bico CHT (`bico-cht.md`) o limite muda. Se o CHT chegar antes, medir direto com ele.
+
+<!-- fonte: to-do/pi-fonte.md -->
+# Fonte nova do Raspberry Pi: confirmar que acabaram a subtensão e as quedas do USB
+- status: fonte comprada; instalação e teste pendentes
+- máquina: Frank Pro (Raspberry Pi 3B)
+- prioridade: alta
+- atualizado: 2026-10-18
+
+## Fatos
+- o Mainsail mostra "Previously Under-Volted" (`throttled_state`)
+- 2026-10-17 ~13h13 (BRT): `Got EOF when reading from device` / `Lost communication with MCU 'mcu'` no klippy.log. A porta USB da MCU caiu.
+- o Pi 3B pede 5.1 V e 2.5 A
+- modelo da fonte comprada: (preencher)
+
+## Hipóteses
+- A fonte atual do Pi derruba a tensão sob carga, e o USB da MCU (CH340) cai junto.
+
+## Próximos passos
+1. Instalar a fonte nova e anotar o modelo aqui.
+2. Reiniciar o Pi. O `get_throttled` zera no boot.
+3. Imprimir normalmente e conferir depois de cada impressão:
+   - `node scripts/frank-pro.mjs --host 192.168.0.150 --param temps` (throttled deve continuar 0x0)
+   - `curl -s http://192.168.0.150/server/files/logs/klippy.log | grep -E "Lost communication|Got EOF"`
+4. Se o USB cair de novo com a tensão OK: suspeitar de cabo/porta USB e, só depois, da UART (ver `resources/utils/raspberry-pi3.md`, que exige recompilar a MCU).
+
+## Riscos
+- Alimentar o Pi pela fonte de 24 V da impressora (buck) corta o Pi junto quando a impressora desliga, e isso pode corromper o SD. Rodar `sudo shutdown -h now` antes.
+
+## Fecha quando
+- `throttled_state` em 0x0 e nenhum `Lost communication` depois de ~5 impressões ou ~20 h de uso.
+
+<!-- fonte: to-do/pla-speed-validacao.md -->
+# Validar o PLA Speed numa impressão real
+- status: em andamento; teste curto do casco (2026-10-18)
+- máquina: Frank Pro
+- prioridade: alta
+- atualizado: 2026-10-18
+
+## Fatos
+- filamento `Creality Taurus PLA Speed` (PLA 3D Fila, vermelho): 225 °C (etiqueta máx. 230), PA 0.038, max volumetric 12 mm³/s; fan 30–40%, overhang fan 80% com `overhang_fan_threshold` 50% (copiados do `Creality Taurus PLA`)
+- vazão no ar a 225 °C: perda de 0.6% a 8 e 10 mm³/s, 0.2% a 12 mm³/s
+- torre de PA: melhor altura 7.62 mm, só a leitura dos cantos
+- faces da torre: 60.00 mm
+- processo `0.20mm Standard @Taurus PLA Speed` = cópia do processo PETG XT Speed
+
+### Benchy 00005D (`3DBenchy_PLA_1h5m.gcode`), 2026-10-18 — com estado errado na impressora
+- impresso sem `RESTART` depois da torre: SCV 1 em vez de 5 durante a impressão inteira. A accel veio do G-code e o PA 0.038 do G-code; o TUNING_TOWER já tinha encerrado sozinho.
+- tempo: 1h20m14s contra 1h05m09s do slicer (+23%). Os Benchy PETG com o mesmo processo deram +5.5%. A diferença é o SCV 1: a cabeça quase para em cada canto.
+- defeito: calombos brilhantes e saltados no vinco da proa, de Z ~5 a ~10 mm, além de um "volume" na lateral do casco (local exato não descrito).
+- G-code na faixa do defeito:
+  - costura na popa (X ~82), então não é costura;
+  - a ponta da proa (X 126–134, Y 110) é overhang de ~45°;
+  - o fan de overhang de 80% vale até Z 4.8; de Z 5.0 em diante fica 39%;
+  - parede externa na ponta entre 20 e 50 mm/s (slowdown de overhang).
+- referência: um Benchy PLA vermelho mais antigo, com o vinco perfeito. Não está no histórico do Klipper; perfil não identificado (perguntado ao usuário).
+
+- medição pela foto (régua: altura da proa 26.26 mm medida pelo usuário, 132.6 camadas contadas × 131.3 esperadas): calombos da camada 26–27 (Z 5.2–5.4) à 46–48 (Z 9.1–9.6), começando 1–2 camadas depois da queda do fan da ponta (Z 5.0)
+
+### Benchy 00005E, 2026-10-18 — mesmo G-code, depois do `RESTART` (SCV 5)
+- ritmo normal: camada 55 (Z 11) aos 24m11s de impressão; cancelado aos 50m20s
+- resultado PIOR: faixa de calombos e linhas enroladas na lateral do casco e na proa, Z ~5–10
+- defeito de UM lado só: o lado que ficou virado para a frente da impressora (Y baixo, proa em +X). O outro lado saiu limpo. A geometria abre igual dos dois lados (G-code: Y 98.8→96.1 e 121.2→123.9 entre Z 5 e 10).
+- conclusão: o SCV 1 não causava o defeito; atenuava, porque deixava as camadas mais lentas (mais tempo para esfriar). Hipótese 1 descartada.
+- as duas 5015 conferidas pelo usuário: refrigeração normal, sem diferença entre os lados. O PETG impresso no dia anterior saiu bom.
+
+## Hipóteses (ordem, atualizada)
+1. Calor/refrigeração no overhang do PLA a 225 °C com fan de 30–40%: o defeito piora com camada mais rápida e aparece onde o casco abre. O lado único segue sem explicação (as ventoinhas estão normais).
+2. Direção/ordem dos caminhos (lado, sentido da parede ou costura em relação ao movimento): explicaria o lado único. O teste de duas cópias separa isso.
+3. PA 0.038 um pouco alto: menos provável, porque o defeito é material sobrando, não faltando.
+
+## Teste em andamento: casco curto em vez do Benchy
+- STL `../projects/calibracao/teste-casco-overhang-duplo.stl`: dois cascos com proa em V de ponta arredondada (raio 2.5 mm; no Benchy o G-code dá 2.4–2.7 mm) e overhang de 45°, laterais abrindo ~32°, popa reta com quinas vivas; base 0–1 mm, abertura 1–6 mm, topo 6–7 mm. A cópia de baixo (Y menor) tem a proa em +X; a de cima é a mesma peça girada 180°.
+- 1ª versão (proa em V viva) cancelada: a costura `aligned` foi para a ponta da proa. Na versão arredondada, a costura vai para uma quina da popa nas duas cópias, como no Benchy (conferido no fatiamento pelo CLI).
+- fatiado no Orca pelo usuário: ~14m50s, 35 camadas, PLA Speed 225 °C, PA 0.038, mesa 65/60 °C, fan 30–40% (overhang 80% acima de 50%); na abertura, parede externa a 53–60 mm/s e fan de 39%, como na faixa do defeito do Benchy.
+- leitura:
+  - defeito no lado virado para a frente nas DUAS cópias → causa ligada à máquina/posição (ar, movimento);
+  - defeito no MESMO lado da peça nas duas → causa ligada ao fatiamento (ordem/sentido dos caminhos);
+  - defeito dos dois lados → refrigeração geral;
+  - sem defeito → o teste não reproduz o Benchy (camada de ~9 s contra ~31 s); voltar ao Benchy cortado.
+
+## Próximos passos
+1. Imprimir o casco curto (`RESTART` antes e conferir `--param limites`). Foto das quatro faces das duas cópias.
+2. Conforme a leitura, uma variável por vez no PLA Speed: fan (30–40% → mais alto) ou temperatura (225 → 215, refazendo a vazão no ar a 8 mm³/s).
+3. Sempre `RESTART` depois de torre ou teste com `SET_VELOCITY_LIMIT`, e conferir com `--param limites` antes de imprimir.
+
+## Fecha quando
+- Benchy sem defeito atribuível a PA, temperatura, vazão ou refrigeração. Registrar em `printers/frank-pro/calibracao.md` e marcar o PLA Speed como VALIDADO em `printers/frank-pro/README.md`.
+
+## Referências
+- `printers/frank-pro/calibracao.md`
+- `../projects/#gcodes/square_tower_PA_PLA_53m.gcode`, `../projects/#gcodes/3DBenchy_PLA_1h5m.gcode`
+
+<!-- fonte: to-do/speed-como-padrao.md -->
+# Promover o perfil Speed a padrão da Frank Pro
+- status: decisão pendente do usuário
+- máquina: Frank Pro
+- prioridade: baixa
+- atualizado: 2026-10-18
+
+## Fatos
+- 2026-10-16: o usuário definiu que, se a qualidade ficar boa, o Speed vira o padrão
+- PETG XT Speed: VALIDADO. O suporte de celular saiu 20% mais rápido (3h26m × 4h18m) com cantos vivos.
+- PLA Speed: falta a impressão real (`pla-speed-validacao.md`)
+- ABS e TPU: sem Speed
+- os presets originais (`Frank Pro 0.4 nozzle`, `0.20mm Standard @Taurus`, filamentos sem "Speed") não são editados; o Speed é override
+
+## Opções
+1. Usar o Speed como padrão de fato, material por material, conforme cada um for validado, e manter os originais como referência. Preferida: não exige mexer em nada.
+2. Renomear (Speed → nome principal) depois que todos os materiais em uso forem validados. Isso exige atualizar repo, Orca e projeto web juntos.
+
+## Fecha quando
+- O usuário escolher a opção. Registrar a decisão em `printers/frank-pro/README.md`.
+
+<!-- fonte: to-do/stray-kids-logo.md -->
+# Logo Stray Kids em 3 cores
+- status: modelo montado no Tinkercad; impressão pendente
+- máquina: Frank Pro
+- prioridade: baixa
+- atualizado: 2026-10-18
+
+## Fatos
+- pasta: `../projects/decoracao-brinquedos/stray-kids/`
+- `stray-kids-letras_150mm_2mm.stl`: 150.01 × 133.09 × 2 mm, 5 peças; traços < 0.8 mm engrossados
+- `stray-kids-K_150mm_2mm.stl`: só o K vermelho, 78.71 × 100.91 × 2 mm, no mesmo referencial das letras
+- o Tinkercad recentraliza os imports: o K fica em X +30.23 mm e Y 0 em relação às letras
+- cores: preto, branco e vermelho. O usuário montou no Tinkercad e não quis o disco de fundo gerado por script.
+
+## Troca de cor no meio da impressão
+Procedimento completo, com descarga e carga: `resources/utils/klipper.md`, seção "Troca de filamento". Resumo:
+- sequência do usuário: `M104 S<temp nova>` → `PAUSE` → trocar o filamento → `RESUME`
+- trocar em menos de 10 min, ou rodar `SET_IDLE_TIMEOUT TIMEOUT=1800` antes: o idle_timeout de 600 s desliga os heaters
+- o RESUME não espera a temperatura (só espera se o idle_timeout tiver disparado). Rodar `M109 S<temp>` antes do RESUME.
+- se os materiais forem diferentes, o perfil fatiado (fan, PA) continua valendo para as camadas seguintes
+- alternativa: `SET_PAUSE_AT_LAYER LAYER=<n>`, ou o "pause" por camada no Orca, que a impressora Speed converte em `PAUSE`
+
+## Fecha quando
+- Peça impressa.
+
+<!-- fonte: to-do/trilhos-lineares.md -->
+# Trilhos lineares em XYZ
+- status: decisão tomada: NÃO fazer agora; hipótese em aberto
+- máquina: Frank Pro
+- prioridade: baixa
+- atualizado: 2026-10-18
+
+## Fatos
+- na S1 Pro, não há ganho de qualidade comprovado com trilhos lineares
+- o kit Tiny Machines não serve na S1
+- os defeitos que apareceram até agora foram resolvidos com temperatura e PA, sem mexer na mecânica
+- o usuário imprime por hobby; um upgrade caro só faz sentido se ele quiser o projeto em si
+
+## Hipóteses
+- Trilhos podem reduzir folga e manutenção das rodinhas, mas isso não foi medido nesta máquina.
+
+## Reabrir quando
+- O Input Shaper (`input-shaper-adxl.md`) ou uma impressão mostrar ringing/folga que regulagem das rodinhas e excêntricos não resolve.
+- Ou o usuário decidir fazer como projeto. Aí pesquisar um kit específico para a S1/S1 Pro, com medidas e compatibilidade confirmadas.
