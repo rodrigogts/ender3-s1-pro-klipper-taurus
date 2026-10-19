@@ -21,6 +21,7 @@
 
 [include mainsail.cfg]
 [include macros.cfg]
+[exclude_object]
 
 [force_move]
 enable_force_move: True
@@ -157,15 +158,15 @@ screw4: 20, 198
 #*# pid_kd = 916.366
 #*#
 #*# [bltouch]
-#*# z_offset = 0.990
+#*# z_offset = 1.070
 #*#
 #*# [bed_mesh default]
 #*# version = 1
 #*# points =
-#*# 	0.057500, 0.095000, 0.172500, 0.332500
-#*# 	-0.052500, 0.000000, 0.095000, 0.082500
-#*# 	0.047500, 0.020000, 0.112500, 0.142500
-#*# 	0.120000, 0.052500, 0.092500, 0.165000
+#*# 	0.107500, 0.102500, 0.172500, 0.397500
+#*# 	-0.040000, -0.022500, 0.087500, 0.117500
+#*# 	0.002500, -0.062500, 0.035000, 0.155000
+#*# 	0.002500, -0.080000, 0.037500, 0.152500
 #*# x_count = 4
 #*# y_count = 4
 #*# mesh_x_pps = 2
@@ -282,7 +283,7 @@ gcode:
 
 # ---------- Posicionamento ----------
 [gcode_macro CENTRO]
-description: Bico no centro da mesa, 5 mm acima
+description: Bico no centro da mesa, 5 mm acima; FOLHA=1 desce ate Z0.1
 gcode:
   {% if "xyz" not in printer.toolhead.homed_axes %}
     G28
@@ -290,9 +291,12 @@ gcode:
   G90
   G1 Z5 F600
   G1 X110 Y110 F6000
+  {% if params.FOLHA|default(0)|int == 1 %}
+    G1 Z0.1 F300
+  {% endif %}
 
 [gcode_macro CANTO]
-description: Bico sobre o parafuso N (1 frente-esq, 2 frente-dir, 3 tras-dir, 4 tras-esq), 5 mm acima
+description: Bico sobre o parafuso N (1 frente-esq, 2 frente-dir, 3 tras-dir, 4 tras-esq), 5 mm acima; FOLHA=1 desce ate Z0.1
 gcode:
   {% set pts = [[20, 29], [195, 29], [195, 198], [20, 198]] %}
   {% set n = params.N|default(1)|int %}
@@ -305,6 +309,16 @@ gcode:
   G90
   G1 Z5 F600
   G1 X{pts[n-1][0]} Y{pts[n-1][1]} F6000
+  {% if params.FOLHA|default(0)|int == 1 %}
+    G1 Z0.1 F300
+  {% endif %}
+
+[gcode_macro SOLTA_XY]
+description: Solta X e Y para mover o bico com a mao; o Z continua travado. Rodar G28 X Y antes de mover pelo Klipper
+gcode:
+  SET_STEPPER_ENABLE STEPPER=stepper_x ENABLE=0
+  SET_STEPPER_ENABLE STEPPER=stepper_y ENABLE=0
+  RESPOND MSG="X e Y soltos. Antes de CENTRO, CANTO ou qualquer movimento em X/Y: G28 X Y"
 
 # ===== fonte: printers/frank-pro/klipper/mainsail.cfg =====
 ## Client klipper macro definitions

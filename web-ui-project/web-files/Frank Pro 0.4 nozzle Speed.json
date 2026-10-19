@@ -47,5 +47,8 @@
 		"Direct Drive Standard"
 	],
 	"printer_settings_id": "Frank Pro 0.4 nozzle Speed",
-	"version": "2.3.2.75"
+	"version": "2.3.2.75",
+	"z_hop": [
+		"0.6"
+	]
 }

@@ -10,7 +10,7 @@ Regras:
 
 | Arquivo | Máquina | Status | Prioridade | Resumo |
 |---|---|---|---|---|
-| [exclude-object.md](exclude-object.md) | Frank Pro | em andamento | alta | Ligar `[exclude_object]` no Klipper e no processo Speed do Orca para cancelar só a peça que falhou. Klipper primeiro, Orca depois |
+| [exclude-object.md](exclude-object.md) | Frank Pro | configurado; falta o teste | alta | `[exclude_object]` no Klipper e nos dois processos do Orca, para cancelar só a peça que falhou. Falta testar a exclusão numa impressão |
 | [mesa-termistor.md](mesa-termistor.md) | Frank Pro | aberto | alta | Termistor da mesa com leitura errática entre 95 e 97 °C que desarmou o verify_heater duas vezes. Suspeita no lado quente; medir ~100 kΩ mexendo o cabo |
 | [pi-fonte.md](pi-fonte.md) | Frank Pro | comprada, teste pendente | alta | Fonte nova do Pi: confirmar que somem o "Previously Under-Volted" e a queda do USB da MCU |
 | [pla-speed-validacao.md](pla-speed-validacao.md) | Frank Pro | pausado | média | Calombos no overhang do casco do Benchy em PLA Speed (Z 5–10). O casco oco reproduz em ~12 min; o teste com PA 0.025 está pronto (G-code editado) e não foi impresso. Peças sem overhang daquele tipo imprimem bem |
@@ -37,7 +37,7 @@ Ordem sugerida na Frank Pro: exclude-object (pedido do usuário; rápido) → me
 - atualizado: 2026-10-19
 
 ## Fatos
-- existe só o baseline `Creality Taurus ABS`: 245 °C (250 na primeira camada), faixa até 250, fan 20%, overhang 35%, herda de `Creality Generic ABS` (mesa 100 °C, max volumetric 12)
+- existe só o baseline `Creality Taurus ABS`: 260 °C (265 na primeira camada, escolha do usuário em 2026-10-19), faixa até 265, fan 20%, overhang 35%, herda de `Creality Generic ABS` (mesa 100 °C, max volumetric 12)
 - nada de ABS foi calibrado no Klipper
 - marca e etiqueta do ABS em uso: não informadas
 - a mesa tem limite de 110 °C (`max_temp`)
@@ -45,10 +45,13 @@ Ordem sugerida na Frank Pro: exclude-object (pedido do usuário; rápido) → me
 - 2026-10-19: clips de saco de 12 cm em ABS (job 000069, 84 g, 6h38m pelo slicer) fatiados com `Frank Pro 0.4 nozzle` + `0.20mm Standard @Taurus Speed` + `Creality Taurus PETG XT Speed` sem alteração: bico 270 °C, mesa 105 °C, fan 10–15%, overhang 25%, PA 0,125 (do PETG XT), sem brim. Parcial, camada ~4/50 às 13:22: pontas sem empenar e impressão boa (relato do usuário, sem gabinete informado). Às 13:29, camada ~4/50 (12,5%), o usuário baixou o bico para 245 °C pelo Mainsail; o G-code não redefine a temperatura depois do start. Resultado: cancelado às 2h39m de impressão; dos 6 clips, o do meio empenou (relato do usuário).
 - 2026-10-19 15:07 (job 00006A): 1 clip, `Frank Pro 0.4 nozzle` + `0.20mm Standard @Taurus` + `Creality Taurus ABS`: bico 250/245 °C, mesa 105 °C, PA desligado, fan 20%, aceleração 500 mm/s², sem brim. Resultado: pendente.
 - 245 °C: o usuário já usou neste ABS e funcionou (sem vazão no ar nem torre).
+- 2026-10-19 18:14 (job 00006E): 9 quadrados de nivelamento 11 × 11 × 2,2 mm em ABS (presets originais) saíram perfeitos; com a mesa ainda a 105 °C, soltaram com muita facilidade (relato do usuário).
+- 2026-10-19 18:42 (job 00006F): 1 quadrado, presets originais com a primeira camada 0,25 mm a 260 °C e o resto a 250 °C; o usuário achou que funcionou. Duas variáveis mudadas juntas. Com o z_offset 1.095 (medido com o bico esfriando), o bico fica ~0,1 mm mais perto que o Klipper calcula: a camada de 0,25 compensa parte disso no slicer.
 - Este clip saiu bem 6 vezes no baseline `Creality Taurus ABS`, sem brim (relato do usuário). Brim dispensado para ele.
 - 270 °C: as camadas 1–4 do job 000069 saíram sem defeito visível (relato do usuário), a 500 mm/s² e vazão baixa.
 
 ## Hipóteses
+- Aderência fraca do ABS na placa explicaria os empenos e as peças arrastadas de 2026-10-19. Gordura de dedo descartada: no nivelamento só o papel toca a mesa. Os quadrados de 11 mm são um teste fraco: área pequena solta fácil de qualquer jeito. Placa: PEI texturizado, sem adesivo.
 - O ABS pede cooling baixo e é sensível a corrente de ar. Gabinete: não informado se existe.
 - Pela tendência PLA 0.038 × PETG 0.125, o PA do ABS deve ficar em torno do do PLA, mas isso não é base para pular a torre.
 - Referência (padrão de fábrica, não medição): nos perfis de sistema Creality do Orca, o PA do ABS fica abaixo do PETG em 8 de 9 máquinas (0,5–0,86× o do PETG; ex.: K1C ABS 0,06 × PETG 0,08; Ender-3 V4 0,026 × 0,05) e perto do PLA (0,04).
@@ -142,32 +145,25 @@ Ordem sugerida na Frank Pro: exclude-object (pedido do usuário; rápido) → me
 
 <!-- fonte: to-do/exclude-object.md -->
 # Exclude object: cancelar só a peça que falhou
-- status: em andamento (Orca feito; falta o Klipper)
+- status: configurado; falta o teste de exclusão
 - máquina: Frank Pro
 - prioridade: alta (pedido do usuário)
 - atualizado: 2026-10-19
 
 ## Fatos
 - 2026-10-19: job 000069 (6 clips em ABS) cancelado com 2h39m de impressão porque o clip do meio empenou. Com exclude object, os outros 5 seguiriam.
-- `printer.cfg` não tem `[exclude_object]`.
+- `[exclude_object]` no printer.cfg, carregado (2026-10-19).
 - No Orca, `exclude_object` é opção do preset de processo (Others → Exclude objects), não da impressora. `gcode_label_objects` já vem 1.
 - 2026-10-19: `"exclude_object": "1"` gravado no `0.20mm Standard @Taurus Speed` (Orca e repo). O Orca só aplica depois de reiniciar.
 - `[exclude_object]` é módulo só do host (Klipper v0.13); a versão da MCU não importa.
-- Só o processo `0.20mm Standard @Taurus Speed` pode receber a opção; o `0.20mm Standard @Taurus` original não se edita.
+- `"exclude_object": "1"` também no `0.20mm Standard @Taurus` original, a pedido do usuário (2026-10-19).
 
 ## Próximos passos
-1. Usuário, pelo Mainsail, com a impressora parada: acrescentar ao `printer.cfg`, fora do bloco do SAVE_CONFIG, e dar `RESTART`:
-   ```ini
-   [exclude_object]
-   ```
-2. Agente: atualizar o snapshot (`node scripts/frank-pro.mjs --host 192.168.0.150 --param cfg --file printer.cfg > printers/frank-pro/klipper/printer.cfg`) e conferir a seção.
-3. Usuário reinicia o Orca (feche sem salvar o processo, senão o GUI sobrescreve).
-4. Fatiar 2 peças e conferir no G-code `EXCLUDE_OBJECT_DEFINE` no cabeçalho e `EXCLUDE_OBJECT_START`/`END` em volta de cada peça.
-5. Testar numa impressão de 2 peças pequenas: excluir uma pelo Mainsail (painel de status → Exclude objects) ou no console com `EXCLUDE_OBJECT NAME=<nome>`; a outra deve terminar normal.
+1. Fatiar 2 peças e conferir no G-code `EXCLUDE_OBJECT_DEFINE` no cabeçalho e `EXCLUDE_OBJECT_START`/`END` em volta de cada peça.
+2. Testar numa impressão de 2 peças pequenas: excluir uma pelo Mainsail (painel de status → Exclude objects) ou no console com `EXCLUDE_OBJECT NAME=<nome>`; a outra deve terminar normal.
 
 ## Riscos
-- G-code com `EXCLUDE_OBJECT_DEFINE` numa impressora sem `[exclude_object]` para com comando desconhecido: não mandar G-code do processo Speed antes do passo 1.
-- `RESTART` derruba a impressão em andamento.
+- G-code com `EXCLUDE_OBJECT_DEFINE` numa impressora sem `[exclude_object]` para com comando desconhecido: não tirar a seção do printer.cfg.
 
 ## Fecha quando
 - Uma peça excluída no meio da impressão e as outras terminando sem defeito. Resultado vai para `printers/frank-pro/README.md` e uma linha sobre o uso em `resources/utils/klipper.md`.
@@ -239,7 +235,7 @@ O estado completo, as hipóteses e o plano estão em `printers/frank-mini/README
   2. escorrimento: só 1 mm de retração enquanto o bico quente espera a limpeza e o clique.
 - correção (v2) instalada em 2026-10-19; antes ficava em `to-do/macros-v2-PARA-INSTALAR.cfg` (v2, só ASCII, diferença mínima para o snapshot): `ret_espera` 2 mm depois da purga (o mesmo do `PAUSE_PARK_RETRACT_LENGTH` padrão do Marlin; 3 mm foi descartado por cautela com plástico derretido subindo para a zona fria durante a espera); no `RETOMA_TROCA`, já no ponto, devolve `ret_espera − 1 − ret_slicer` (0.2 mm) antes do `RESUME`. Com o `RESUME` (+1) e o `G1 E.8` do G-code, a conta fecha em zero. Instalar sem impressão rodando: upload por cima do `macros.cfg` e Salvar e reiniciar; depois atualizar o snapshot e apagar `to-do/macros-v2-PARA-INSTALAR.cfg`. Atenção: `printers/frank-pro/klipper/macros.cfg` é o snapshot do que já está na impressora (v1); colar ele não muda nada (aconteceu em 2026-10-19 00:54).
 - contorno manual enquanto a v2 não entra: depois de limpar o bico e antes de clicar Retomar, `M83` e `G1 E-0.8 F2100` no console (tira a sobra de 0.8 mm).
-- testar `PREAQUECE_BICO` com o bico já quente (o alvo deve continuar no valor atual)
+- testar `PREAQUECE_BICO` com o bico já quente (o alvo deve continuar no valor atual); a macro está no start G-code das duas impressoras
 
 - máquina: Frank Pro
 - prioridade: média
