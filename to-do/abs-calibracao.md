@@ -5,7 +5,7 @@
 - atualizado: 2026-10-19
 
 ## Fatos
-- existe só o baseline `Creality Taurus ABS`: 245 °C (250 na primeira camada), faixa até 250, fan 20%, overhang 35%, herda de `Creality Generic ABS` (mesa 100 °C, max volumetric 12)
+- existe só o baseline `Creality Taurus ABS`: 260 °C (265 na primeira camada, escolha do usuário em 2026-10-19), faixa até 265, fan 20%, overhang 35%, herda de `Creality Generic ABS` (mesa 100 °C, max volumetric 12)
 - nada de ABS foi calibrado no Klipper
 - marca e etiqueta do ABS em uso: não informadas
 - a mesa tem limite de 110 °C (`max_temp`)

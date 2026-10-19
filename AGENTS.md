@@ -69,11 +69,11 @@ Ferramenta padrão de consulta e diagnóstico: `scripts/frank-pro.mjs` (Node 18+
 - Não usar `M420 S1`.
 - Pause G-code: `PAUSE`. Change filament G-code: `M600` na impressora Speed (o "Add color change" do Orca gera `M600`) e `PAUSE` na Frank Pro normal.
 - `M600` é a macro estilo Marlin do `macros.cfg` (validada): troca de cor por camada guiada por janelas no Mainsail. Detalhes em `resources/utils/klipper.md`.
-- O start G-code da impressora Speed usa `PREAQUECE_BICO S=170` (macro do `macros.cfg`): sem esse arquivo na impressora, a impressão para com comando desconhecido.
+- O start G-code das duas impressoras (`Frank Pro 0.4 nozzle` e `Frank Pro 0.4 nozzle Speed`) usa `PREAQUECE_BICO S=170` (macro do `macros.cfg`): sem esse arquivo na impressora, a impressão para com comando desconhecido.
 - Os processos `0.20mm Standard @Taurus` e `@Taurus Speed` têm `exclude_object` ligado: o G-code sai com `EXCLUDE_OBJECT_DEFINE`, que exige `[exclude_object]` no printer.cfg (configurado). Sem a seção, a impressão para com comando desconhecido.
 - O start G-code da Speed espera temperatura com `TEMPERATURE_WAIT` (MIN = alvo; MAX = alvo +3 na mesa, +8 no bico), não com `M190`/`M109`, que no Klipper esperam a temperatura estabilizar e somam ~1,5 min por impressão com o pico do PID. Manter `M140`/`M104` no start, senão o Orca insere `M190`/`M109` sozinho.
 - Não ativar firmware retraction sem `[firmware_retraction]`.
-- Nunca editar os presets de sistema nem os personalizados originais (`Frank Pro 0.4 nozzle`, `0.20mm Standard @Taurus`, filamentos sem "Speed"). Trabalhar nos overrides Speed.
+- Nunca editar os presets de sistema. Os personalizados originais (`Frank Pro 0.4 nozzle`, `0.20mm Standard @Taurus`, filamentos sem "Speed") só mudam a pedido explícito do usuário; o trabalho normal é nos overrides Speed.
 - Um processo por bico e qualidade, não por material: `0.20mm Standard @Taurus Speed` serve para todos os filamentos Speed. O que é do material (temperatura, PA, fan, retração, vazão) vai no preset de filamento. Material novo = só um filamento Speed novo. Processo novo só para outro bico, outra altura de camada ou material que exija velocidades diferentes (ex.: TPU).
 - Ao alterar um preset: gravar em `~/.config/OrcaSlicer/user/default/` e na cópia do repo, que precisam ficar idênticas. O Orca só lê preset alterado depois de reiniciar; se o GUI antigo salvar antes, sobrescreve a mudança. Avisar o usuário.
 - Pressure Advance mora no preset de filamento Speed do material (`enable_pressure_advance` + `pressure_advance`), com `SET_PRESSURE_ADVANCE ADVANCE=0` no `filament_end_gcode`. printer.cfg fica com PA 0.

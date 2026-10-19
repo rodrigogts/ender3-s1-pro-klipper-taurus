@@ -15,7 +15,7 @@
   2. escorrimento: só 1 mm de retração enquanto o bico quente espera a limpeza e o clique.
 - correção (v2) instalada em 2026-10-19; antes ficava em `to-do/macros-v2-PARA-INSTALAR.cfg` (v2, só ASCII, diferença mínima para o snapshot): `ret_espera` 2 mm depois da purga (o mesmo do `PAUSE_PARK_RETRACT_LENGTH` padrão do Marlin; 3 mm foi descartado por cautela com plástico derretido subindo para a zona fria durante a espera); no `RETOMA_TROCA`, já no ponto, devolve `ret_espera − 1 − ret_slicer` (0.2 mm) antes do `RESUME`. Com o `RESUME` (+1) e o `G1 E.8` do G-code, a conta fecha em zero. Instalar sem impressão rodando: upload por cima do `macros.cfg` e Salvar e reiniciar; depois atualizar o snapshot e apagar `to-do/macros-v2-PARA-INSTALAR.cfg`. Atenção: `printers/frank-pro/klipper/macros.cfg` é o snapshot do que já está na impressora (v1); colar ele não muda nada (aconteceu em 2026-10-19 00:54).
 - contorno manual enquanto a v2 não entra: depois de limpar o bico e antes de clicar Retomar, `M83` e `G1 E-0.8 F2100` no console (tira a sobra de 0.8 mm).
-- testar `PREAQUECE_BICO` com o bico já quente (o alvo deve continuar no valor atual)
+- testar `PREAQUECE_BICO` com o bico já quente (o alvo deve continuar no valor atual); a macro está no start G-code das duas impressoras
 
 - máquina: Frank Pro
 - prioridade: média

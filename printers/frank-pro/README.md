@@ -41,7 +41,7 @@ Legenda: VALIDADO = medido ou testado na máquina; PENDENTE = ainda não feito; 
   - `M600` estilo Marlin + `CARREGA_TROCA` e `RETOMA_TROCA` (VALIDADO, PLA): sobe o Z, estaciona em X0 Y220, descarrega 50 mm e abre a janela de confirmação no Mainsail; purga em X0 Y0 e retrai 2 mm enquanto espera; volta com XY no alto e descida vertical e, no ponto, devolve só o necessário para fechar com os 0.8 mm que o Orca devolve depois do `M600` (sem gotinha). idle_timeout 1800 s durante a troca, 600 s depois.
   - `CENTRO` e `CANTO N=1..4`: bico no centro ou sobre os parafusos da mesa, 5 mm acima; com `FOLHA=1`, descem até Z0.1 (teste do papel).
   - `SOLTA_XY`: desliga só os motores X e Y para mover o bico com a mão; o Z continua travado. Não apaga o home: rodar `G28 X Y` antes de mover pelo Klipper.
-  - `PREAQUECE_BICO S=170`: usado no start G-code da impressora Speed; só pré-aquece se o alvo do bico estiver abaixo de 170. O start G-code do preset Speed depende deste arquivo.
+  - `PREAQUECE_BICO S=170`: usado no start G-code das duas impressoras; só pré-aquece se o alvo do bico estiver abaixo de 170. Os start G-codes dependem deste arquivo.
 - impressora Speed: Change filament G-code = `M600` (o "Add color change" do Orca gera `M600`; peça de uma cor não ganha `M600`) e Pause G-code = `PAUSE`. Impressora normal: `PAUSE` nos dois. Também funcionam G-code custom `M600` e `SET_PAUSE_AT_LAYER LAYER=<n> MACRO=M600`.
 - `[exclude_object]`: configurado; o Mainsail mostra o botão de excluir peça quando o G-code tem `EXCLUDE_OBJECT_DEFINE` (teste de exclusão PENDENTE, `to-do/exclude-object.md`)
 - `[force_move]`: `enable_force_move: True` (libera `FORCE_MOVE` e `SET_KINEMATIC_POSITION`; nenhuma macro usa)
@@ -50,13 +50,14 @@ Legenda: VALIDADO = medido ou testado na máquina; PENDENTE = ainda não feito; 
 - quem altera o Klipper: o usuário, manualmente, pelo Mainsail. Os snapshots em `klipper/` são só leitura.
 
 ## Orca — presets (`orca/`)
-- impressora `Frank Pro 0.4 nozzle`: perfil original; limites de máquina herdados da S1 Pro
-- impressora `Frank Pro 0.4 nozzle Speed`: limites 2000 mm/s² e 300 mm/s alinhados ao printer.cfg; `SET_PRINT_STATS_INFO` (camada atual e total); `M600` na troca de filamento e `PAUSE` na pausa; aquecimento com `PREAQUECE_BICO S=170` e `TEMPERATURE_WAIT` (mesa MIN alvo / MAX alvo+3; bico MIN alvo / MAX alvo+8), que libera ao chegar no alvo sem esperar o pico do PID estabilizar
-- processo `0.20mm Standard @Taurus`: perfil original; `exclude_object` ligado, como no Speed
-- processo `0.20mm Standard @Taurus Speed`: um só para todos os filamentos Speed; acelerações por tipo (parede externa e topo 1000, internas e sólido 1600, sparse 1800, travel 2000, primeira camada 650/900); paredes internas e infill a 90 mm/s, parede externa 60, topo 40; `exclude_object` ligado (gera `EXCLUDE_OBJECT_DEFINE`/`START`/`END`, que exigem `[exclude_object]` no printer.cfg)
+- impressora `Frank Pro 0.4 nozzle`: perfil original; limites de máquina herdados da S1 Pro; z-hop 0.6 mm; aquecimento com `PREAQUECE_BICO S=170` e espera com `M190`/`M109`
+- impressora `Frank Pro 0.4 nozzle Speed`: limites 2000 mm/s² e 300 mm/s alinhados ao printer.cfg; z-hop 0.6 mm em toda retração; `SET_PRINT_STATS_INFO` (camada atual e total); `M600` na troca de filamento e `PAUSE` na pausa; aquecimento com `PREAQUECE_BICO S=170` e `TEMPERATURE_WAIT` (mesa MIN alvo / MAX alvo+3; bico MIN alvo / MAX alvo+8), que libera ao chegar no alvo sem esperar o pico do PID estabilizar
+- processo `0.20mm Standard @Taurus`: perfil original; "Evitar cruzar paredes" e `exclude_object` ligados, como no Speed
+- processo `0.20mm Standard @Taurus Speed`: um só para todos os filamentos Speed; acelerações por tipo (parede externa e topo 1000, internas e sólido 1600, sparse 1800, travel 2000, primeira camada 650/900); paredes internas e infill a 90 mm/s, parede externa 60, topo 40; "Evitar cruzar paredes" ligado (`reduce_crossing_wall`, sem limite de desvio): o deslocamento contorna as peças em vez de passar por cima; `exclude_object` ligado (gera `EXCLUDE_OBJECT_DEFINE`/`START`/`END`, que exigem `[exclude_object]` no printer.cfg)
 - filamento `Creality Taurus PETG XT Speed`: VALIDADO (PETG XT/Tritan HT 3D Fila, 270 °C, PA 0.125)
 - filamento `Creality Taurus PLA Speed`: PLA 3D Fila, 225 °C e PA 0.038 medidos; impressão completa ainda PENDENTE
-- demais filamentos (`Creality Taurus PLA/PETG/PETG XT/ABS/TPU`): baseline, não calibrados no Klipper
+- filamento `Creality Taurus ABS`: 260 °C, 265 °C na primeira camada (escolha do usuário; temperatura, vazão e PA não calibrados no Klipper)
+- demais filamentos (`Creality Taurus PLA/PETG/PETG XT/TPU`): baseline, não calibrados no Klipper
 - PA mora no preset de filamento (`enable_pressure_advance` + `pressure_advance`); o `filament_end_gcode` zera com `SET_PRESSURE_ADVANCE ADVANCE=0`. O printer.cfg fica com PA 0.
 - cancelar uma impressão não roda o end gcode: o PA e qualquer SET_VELOCITY_LIMIT ficam ativos até `RESTART`
 - resultados e procedimentos de calibração: `calibracao.md`
