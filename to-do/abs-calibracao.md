@@ -17,7 +17,7 @@
 
 ## Próximos passos
 1. Anotar a faixa de temperatura da etiqueta do ABS.
-2. Criar `Creality Taurus ABS Speed` como cópia do baseline e um processo `0.20mm Standard @Taurus ABS Speed`, com PA desligado e `SET_PRESSURE_ADVANCE ADVANCE=0` no end gcode, igual aos outros Speed.
+2. Criar `Creality Taurus ABS Speed` como cópia do baseline (o processo é o `0.20mm Standard @Taurus Speed`, comum a todos), com PA desligado e `SET_PRESSURE_ADVANCE ADVANCE=0` no end gcode, igual aos outros Speed.
 3. Fazer a vazão no ar (procedimento em `printers/frank-pro/calibracao.md`) e escolher a temperatura.
 4. Fazer a torre de PA com o filamento ABS Speed.
 5. Imprimir um Benchy e conferir empeno e delaminação.

@@ -19,7 +19,7 @@ Configurações do OrcaSlicer, estado das máquinas e ferramentas da **Frank Pro
 | Tipo | Presets |
 |---|---|
 | `machine/` | `Frank Pro 0.4 nozzle`, `Frank Pro 0.4 nozzle Speed` |
-| `process/` | `0.20mm Standard @Taurus`, `… @Taurus PETG XT Speed`, `… @Taurus PLA Speed` |
+| `process/` | `0.20mm Standard @Taurus`, `0.20mm Standard @Taurus Speed` (um processo para todos os filamentos Speed) |
 | `filament/` | `Creality Taurus PLA/PETG/ABS/TPU`, `Creality Taurus PETG XT` (Tritan HT 3D Fila), `Creality Taurus PETG XT Speed`, `Creality Taurus PLA Speed` |
 
 Os presets Speed são os calibrados (temperatura, vazão e Pressure Advance por material); os demais são o baseline. Cada preset guarda só os campos alterados e herda o resto da base indicada em `inherits`. O [guia de presets](web-ui-project/knowledge/guia-presets.md) explica a herança e onde procurar cada valor.

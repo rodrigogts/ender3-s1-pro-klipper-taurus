@@ -34,7 +34,7 @@ TEMPERATURE_WAIT SENSOR=heater_bed MINIMUM=100           ; espera só chegar; ac
 TURN_OFF_HEATERS
 ```
 - A mesa tem `max_temp` 110, então o máximo prático é ~105 °C.
-- `M109`/`M190` só liberam com a temperatura estável (±1 °C e < 0,1 °C/s). Medido em 2026-10-18: bico 170 → 225 passa a 229,3 °C e só libera aos ~70 s (chegou aos ~29 s); mesa → 65 passa a 66,1 °C e libera ~50 s depois de chegar. O start G-code da Speed usa `TEMPERATURE_WAIT` para não esperar esse pico.
+- `M109`/`M190` só liberam com a temperatura estável (±1 °C e < 0,1 °C/s). Na Frank Pro, o bico 170 → 225 passa a ~229 °C e só libera ~40 s depois de chegar; a mesa → 65 passa a ~66 °C e libera ~50 s depois. O start G-code da Speed usa `TEMPERATURE_WAIT`, que libera ao chegar.
 - O idle_timeout é de 600 s. Quando dispara, desliga os heaters e roda M84. Pra pausa longa: `SET_IDLE_TIMEOUT TIMEOUT=1800`.
 
 ## PID (repetir se trocar bico, heater, termistor ou cooling)
@@ -105,7 +105,7 @@ G1 Z0.1 F300                 ; teste do papel (Z0 = bico encostando, pelo z_offs
 - Atalhos (`macros.cfg`): `CENTRO` e `CANTO N=1..4` sobem a 5 mm e levam o bico ao centro ou ao parafuso N.
 
 ## Troca de filamento (cor por camada, Klipper)
-Com a impressora Speed, o "Add color change" da barra de camadas do Orca já gera `M600` (Change filament G-code = `M600` desde 2026-10-19). Com o `macros.cfg` (instalado e testado em 2026-10-18), a troca é o `M600` estilo Marlin: `SET_PAUSE_AT_LAYER LAYER=<n> MACRO=M600` no console, ou `M600` no G-code depois de `SET_PRINT_STATS_INFO CURRENT_LAYER=<n>`. Daí em diante, seguir a janela do Mainsail (Carregar e purgar → Retomar). Detalhes em `to-do/macros-klipper.md`.
+Com a impressora Speed, o "Add color change" da barra de camadas do Orca gera `M600`, a troca estilo Marlin do `macros.cfg`. Outros jeitos de chamar: `SET_PAUSE_AT_LAYER LAYER=<n> MACRO=M600` no console, ou `M600` no G-code depois de `SET_PRINT_STATS_INFO CURRENT_LAYER=<n>`. Daí em diante, seguir a janela do Mainsail (Carregar e purgar → Retomar). Detalhes em `to-do/macros-klipper.md`.
 
 Troca manual, sem o `M600` (alternativa):
 

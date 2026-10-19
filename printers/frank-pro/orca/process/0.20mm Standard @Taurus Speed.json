@@ -13,7 +13,7 @@
 	"internal_bridge_speed": "20",
 	"internal_solid_infill_acceleration": "1600",
 	"internal_solid_infill_speed": "90",
-	"name": "0.20mm Standard @Taurus PLA Speed",
+	"name": "0.20mm Standard @Taurus Speed",
 	"outer_wall_acceleration": "1000",
 	"outer_wall_speed": "60",
 	"print_extruder_id": [
@@ -22,7 +22,7 @@
 	"print_extruder_variant": [
 		"Direct Drive Standard"
 	],
-	"print_settings_id": "0.20mm Standard @Taurus PLA Speed",
+	"print_settings_id": "0.20mm Standard @Taurus Speed",
 	"sparse_infill_acceleration": "1800",
 	"sparse_infill_pattern": "line",
 	"sparse_infill_speed": "90",
